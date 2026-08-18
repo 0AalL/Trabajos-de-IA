@@ -8,6 +8,7 @@ from bidireccional import bidireccional
 from interfaz import seleccionar_posiciones
 from ejecucion import ejecutar
 from resultados import obtener_datos_solucion
+from dibujar_solucion import dibujar_camino
 
 
 FILAS = 10
@@ -56,7 +57,7 @@ def main():
     print("m = profundidad máxima del árbol de búsqueda")
 
     # ==========================================
-    # ARCHIVO DE RESULTADOS
+    # CABECERA DEL ARCHIVO
     # ==========================================
 
     salida_total = ""
@@ -93,6 +94,32 @@ def main():
     salida_total += salida
 
     # ==========================================
+    # DIBUJO BFS
+    # ==========================================
+
+    solucion_bfs = resultado_bfs[0]
+
+    if solucion_bfs is not None:
+
+        camino_bfs, acciones_bfs = obtener_datos_solucion(
+            solucion_bfs
+        )
+
+        dibujo_bfs = dibujar_camino(
+            FILAS,
+            COLUMNAS,
+            camino_bfs
+        )
+
+        print("\nBFS - SOLUCIÓN")
+        print(dibujo_bfs)
+
+        salida_total += (
+            "\nBFS - SOLUCIÓN\n"
+            + dibujo_bfs
+        )
+
+    # ==========================================
     # DFS
     # ==========================================
 
@@ -105,6 +132,32 @@ def main():
     )
 
     salida_total += salida
+
+    # ==========================================
+    # DIBUJO DFS
+    # ==========================================
+
+    solucion_dfs = resultado_dfs[0]
+
+    if solucion_dfs is not None:
+
+        camino_dfs, acciones_dfs = obtener_datos_solucion(
+            solucion_dfs
+        )
+
+        dibujo_dfs = dibujar_camino(
+            FILAS,
+            COLUMNAS,
+            camino_dfs
+        )
+
+        print("\nDFS - SOLUCIÓN")
+        print(dibujo_dfs)
+
+        salida_total += (
+            "\nDFS - SOLUCIÓN\n"
+            + dibujo_dfs
+        )
 
     # ==========================================
     # IDDFS
@@ -122,6 +175,32 @@ def main():
     salida_total += salida
 
     # ==========================================
+    # DIBUJO IDDFS
+    # ==========================================
+
+    solucion_iddfs = resultado_iddfs[0]
+
+    if solucion_iddfs is not None:
+
+        camino_iddfs, acciones_iddfs = obtener_datos_solucion(
+            solucion_iddfs
+        )
+
+        dibujo_iddfs = dibujar_camino(
+            FILAS,
+            COLUMNAS,
+            camino_iddfs
+        )
+
+        print("\nIDDFS - SOLUCIÓN")
+        print(dibujo_iddfs)
+
+        salida_total += (
+            "\nIDDFS - SOLUCIÓN\n"
+            + dibujo_iddfs
+        )
+
+    # ==========================================
     # BIDIRECCIONAL
     # ==========================================
 
@@ -135,6 +214,32 @@ def main():
     )
 
     salida_total += salida
+
+    # ==========================================
+    # DIBUJO BIDIRECCIONAL
+    # ==========================================
+
+    solucion_bidir = resultado_bidir[0]
+
+    if solucion_bidir is not None:
+
+        camino_bidir, acciones_bidir = obtener_datos_solucion(
+            solucion_bidir
+        )
+
+        dibujo_bidir = dibujar_camino(
+            FILAS,
+            COLUMNAS,
+            camino_bidir
+        )
+
+        print("\nBIDIRECCIONAL - SOLUCIÓN")
+        print(dibujo_bidir)
+
+        salida_total += (
+            "\nBIDIRECCIONAL - SOLUCIÓN\n"
+            + dibujo_bidir
+        )
 
     # ==========================================
     # COMPARAR CAMINOS
@@ -193,7 +298,7 @@ def main():
         ]
 
         # Si hay empate en longitud,
-        # gana el que tarda menos.
+        # elegimos el que tarda menos.
 
         mejor = min(
             mejores,
@@ -226,6 +331,24 @@ def main():
 
         salida_total += resumen
 
+        # ======================================
+        # DIBUJO DEL MEJOR CAMINO
+        # ======================================
+
+        dibujo_mejor = dibujar_camino(
+            FILAS,
+            COLUMNAS,
+            camino
+        )
+
+        print("DIBUJO DEL CAMINO MÁS CORTO")
+        print(dibujo_mejor)
+
+        salida_total += (
+            "\nDIBUJO DEL CAMINO MÁS CORTO\n"
+            + dibujo_mejor
+        )
+
     else:
 
         resumen = (
@@ -239,7 +362,7 @@ def main():
         salida_total += resumen
 
     # ==========================================
-    # GUARDAR RESULTADOS
+    # GUARDAR TODO
     # ==========================================
 
     with open(

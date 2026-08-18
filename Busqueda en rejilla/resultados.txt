@@ -140,13 +140,32 @@ Nodos expandidos:
                                                     └── (0, 14)
                                                         └── (0, 15)
 Tiempo:
-0.0004091000009793788 segundos
+0.00038390000190702267 segundos
 
 Complejidad temporal:
 O(3^d)
 
 Complejidad espacial:
 O(3^d)
+
+BFS - SOLUCIÓN
+
+DIBUJO DEL CAMINO
+==============================
+ S  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  G 
+
+S = Inicio
+G = Objetivo
+Flechas = dirección del camino
 
 ==============================
 BÚSQUEDA EN PROFUNDIDAD (DFS)
@@ -193,13 +212,32 @@ Nodos expandidos:
                                                         ├── (6, 3)
                                                         └── (5, 2)
 Tiempo:
-0.00042129999928874895 segundos
+0.0002963999977509957 segundos
 
 Complejidad temporal:
 O(3^m)
 
 Complejidad espacial:
 O(3m)
+
+DFS - SOLUCIÓN
+
+DIBUJO DEL CAMINO
+==============================
+ S  .  →  →  ↓  .  →  →  ↓  .  →  →  ↓  .  →  →  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  . 
+ →  →  ↑  .  →  →  ↑  .  →  →  ↑  .  →  →  ↑  .  →  →  →  G 
+
+S = Inicio
+G = Objetivo
+Flechas = dirección del camino
 
 ==============================
 PROFUNDIDAD ITERATIVA (IDDFS)
@@ -214,13 +252,32 @@ Nodos expandidos:
 6845
 
 Tiempo:
-0.02083419999689795 segundos
+0.014442400002735667 segundos
 
 Complejidad temporal:
 O(3^d)
 
 Complejidad espacial:
 O(3d)
+
+IDDFS - SOLUCIÓN
+
+DIBUJO DEL CAMINO
+==============================
+ S  .  →  →  ↓  .  →  →  ↓  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  →  →  ↓  .  .  .  .  .  .  . 
+ ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  ↑  .  ↓  .  .  .  .  →  →  ↓ 
+ →  →  ↑  .  →  →  ↑  .  →  →  ↑  .  →  →  →  →  →  ↑  .  G 
+
+S = Inicio
+G = Objetivo
+Flechas = dirección del camino
 
 ==============================
 BÚSQUEDA BIDIRECCIONAL
@@ -445,7 +502,7 @@ Nodos expandidos:
                                             └── (9, 7)
                                                 └── (9, 6)
 Tiempo:
-0.0006409999987226911 segundos
+0.00037740000334451906 segundos
 
 Complejidad temporal:
 O(3^(d/2))
@@ -453,13 +510,51 @@ O(3^(d/2))
 Complejidad espacial:
 O(3^(d/2))
 
+BIDIRECCIONAL - SOLUCIÓN
+
+DIBUJO DEL CAMINO
+==============================
+ S  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  G 
+
+S = Inicio
+G = Objetivo
+Flechas = dirección del camino
+
 ======================================
           CAMINO MÁS CORTO
 ======================================
-Método de búsqueda: BFS
-Camino: [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (8, 0), (9, 0), (9, 1), (9, 2), (9, 3), (9, 4), (9, 5), (9, 6), (9, 7), (9, 8), (9, 9), (9, 10), (9, 11), (9, 12), (9, 13), (9, 14), (9, 15), (9, 16), (9, 17), (9, 18), (9, 19)]
-Acciones: ['ABAJO', 'ABAJO', 'ABAJO', 'ABAJO', 'ABAJO', 'ABAJO', 'ABAJO', 'ABAJO', 'ABAJO', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA', 'DERECHA']
+Método de búsqueda: Bidireccional
+Camino: [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7), (4, 8), (4, 9), (4, 10), (4, 11), (4, 12), (4, 13), (4, 14), (4, 15), (4, 16), (4, 17), (4, 18), (4, 19), (5, 19), (6, 19), (7, 19), (8, 19), (9, 19)]
+Acciones: []
 Longitud: 28
-Tiempo: 0.0004091000009793788 segundos
-Nodos expandidos: 199
+Tiempo: 0.00037740000334451906 segundos
+Nodos expandidos: 181
 ======================================
+
+DIBUJO DEL CAMINO MÁS CORTO
+
+DIBUJO DEL CAMINO
+==============================
+ S  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ ↓  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+ →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  →  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ↓ 
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  G 
+
+S = Inicio
+G = Objetivo
+Flechas = dirección del camino
