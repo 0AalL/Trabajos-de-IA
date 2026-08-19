@@ -109,8 +109,7 @@ def bidireccional(problema):
             return (
                 solucion,
                 nodos_expandidos,
-                raiz_inicial,
-                raiz_objetivo
+                raiz_inicial
             )
 
     # ==========================================
