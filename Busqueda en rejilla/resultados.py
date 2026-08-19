@@ -46,13 +46,37 @@ def mostrar_resultado(
     salida = ""
     salida_consola = ""
 
+    # ==========================================
+    # DATOS DEL RESULTADO
+    # ==========================================
+
     if es_bidireccional:
 
-        solucion, nodos_expandidos, raiz_inicio, raiz_objetivo = resultado
+        # Búsqueda bidireccional:
+        #
+        # 4 elementos:
+        # solucion, nodos_expandidos, raiz_inicio, raiz_objetivo
+        #
+        # 3 elementos:
+        # solucion, nodos_expandidos, raiz
+
+        if len(resultado) == 4:
+
+            solucion, nodos_expandidos, raiz_inicio, raiz_objetivo = resultado
+
+            tipo_arbol = "dos"
+
+        else:
+
+            solucion, nodos_expandidos, raiz = resultado
+
+            tipo_arbol = "uno"
 
     else:
 
         solucion, nodos_expandidos, raiz = resultado
+
+        tipo_arbol = "uno"
 
     cabecera = (
         "\n==============================\n"
@@ -75,7 +99,11 @@ def mostrar_resultado(
         if not mostrar_arbol:
             return salida, salida_consola
 
-        if es_bidireccional:
+        # ==========================================
+        # BIDIRECCIONAL CON DOS ÁRBOLES
+        # ==========================================
+
+        if es_bidireccional and tipo_arbol == "dos":
 
             salida += "\nÁRBOL DE BÚSQUEDA DESDE EL INICIO:\n"
             salida += imprimir_arbol(raiz_inicio)
@@ -102,6 +130,29 @@ def mostrar_resultado(
                 raiz_objetivo,
                 profundidad_maxima=profundidad_consola
             )
+
+        # ==========================================
+        # BIDIRECCIONAL CON UN SOLO ÁRBOL
+        # ==========================================
+
+        elif es_bidireccional and tipo_arbol == "uno":
+
+            salida += "\nÁRBOL DE BÚSQUEDA:\n"
+            salida += imprimir_arbol(raiz)
+
+            salida_consola += (
+                "\nÁRBOL DE BÚSQUEDA "
+                f"(primeros {profundidad_consola} niveles):\n"
+            )
+
+            salida_consola += imprimir_arbol(
+                raiz,
+                profundidad_maxima=profundidad_consola
+            )
+
+        # ==========================================
+        # BÚSQUEDA NORMAL
+        # ==========================================
 
         else:
 
@@ -152,10 +203,10 @@ def mostrar_resultado(
         return salida, salida_consola
 
     # ==========================================
-    # ÁRBOLES
+    # BIDIRECCIONAL CON DOS ÁRBOLES
     # ==========================================
 
-    if es_bidireccional:
+    if es_bidireccional and tipo_arbol == "dos":
 
         salida += "\nÁRBOL DE BÚSQUEDA DESDE EL INICIO:\n"
         salida += imprimir_arbol(raiz_inicio)
@@ -182,6 +233,29 @@ def mostrar_resultado(
             raiz_objetivo,
             profundidad_maxima=profundidad_consola
         )
+
+    # ==========================================
+    # BIDIRECCIONAL CON UN SOLO ÁRBOL
+    # ==========================================
+
+    elif es_bidireccional and tipo_arbol == "uno":
+
+        salida += "\nÁRBOL DE BÚSQUEDA:\n"
+        salida += imprimir_arbol(raiz)
+
+        salida_consola += (
+            "\nÁRBOL DE BÚSQUEDA "
+            f"(primeros {profundidad_consola} niveles):\n"
+        )
+
+        salida_consola += imprimir_arbol(
+            raiz,
+            profundidad_maxima=profundidad_consola
+        )
+
+    # ==========================================
+    # BÚSQUEDA NORMAL
+    # ==========================================
 
     else:
 
