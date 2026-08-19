@@ -4,91 +4,124 @@ from nodo import Nodo
 
 def bidireccional(problema):
 
-    nodo_inicial = Nodo(problema.inicial)
-    nodo_objetivo = Nodo(problema.objetivo)
+    # ==========================================
+    # RAÍCES
+    # ==========================================
+
+    raiz_inicial = Nodo(problema.inicial)
+    raiz_objetivo = Nodo(problema.objetivo)
+
+    # ==========================================
+    # COLAS
+    # ==========================================
 
     cola_inicial = Cola()
-    cola_inicial.encolar(nodo_inicial)
+    cola_inicial.encolar(raiz_inicial)
 
     cola_objetivo = Cola()
-    cola_objetivo.encolar(nodo_objetivo)
+    cola_objetivo.encolar(raiz_objetivo)
 
-    visitados_inicial = {
-        problema.inicial: nodo_inicial
+    # ==========================================
+    # VISITADOS
+    # ==========================================
+
+    visitados_inicial = {problema.inicial}
+    visitados_objetivo = {problema.objetivo}
+
+    # ==========================================
+    # NODOS VISITADOS
+    # ==========================================
+
+    nodos_inicial = {
+        problema.inicial: raiz_inicial
     }
 
-    visitados_objetivo = {
-        problema.objetivo: nodo_objetivo
+    nodos_objetivo = {
+        problema.objetivo: raiz_objetivo
     }
 
     nodos_expandidos = 0
+
+    # ==========================================
+    # BÚSQUEDA
+    # ==========================================
 
     while (
         not cola_inicial.esta_vacia()
         and not cola_objetivo.esta_vacia()
     ):
 
-        # Expandimos un nodo desde el inicio
+        # ==========================================
+        # EXPANDIR DESDE EL INICIO
+        # ==========================================
+
         resultado = expandir(
             problema,
             cola_inicial,
             visitados_inicial,
-            visitados_objetivo
+            nodos_inicial,
+            visitados_objetivo,
+            nodos_objetivo
         )
 
         nodos_expandidos += 1
 
         if resultado is not None:
 
-            nodo_inicio, nodo_fin = resultado
+            nodo_inicio, nodo_objetivo = resultado
 
-            camino_inicio = nodo_inicio.obtener_camino()
-
-            camino_fin = nodo_fin.obtener_camino()
-            camino_fin.reverse()
-
-            camino = camino_inicio + camino_fin[1:]
-
-            return (
-                camino,
-                nodos_expandidos,
-                nodo_inicial,
+            solucion = construir_solucion(
+                nodo_inicio,
                 nodo_objetivo
             )
 
-        # Expandimos un nodo desde el objetivo
+            return (
+                solucion,
+                nodos_expandidos,
+                raiz_inicial,
+                raiz_objetivo
+            )
+
+        # ==========================================
+        # EXPANDIR DESDE EL OBJETIVO
+        # ==========================================
+
         resultado = expandir(
             problema,
             cola_objetivo,
             visitados_objetivo,
-            visitados_inicial
+            nodos_objetivo,
+            visitados_inicial,
+            nodos_inicial
         )
 
         nodos_expandidos += 1
 
         if resultado is not None:
 
-            nodo_fin, nodo_inicio = resultado
+            nodo_objetivo, nodo_inicio = resultado
 
-            camino_inicio = nodo_inicio.obtener_camino()
-
-            camino_fin = nodo_fin.obtener_camino()
-            camino_fin.reverse()
-
-            camino = camino_inicio + camino_fin[1:]
-
-            return (
-                camino,
-                nodos_expandidos,
-                nodo_inicial,
+            solucion = construir_solucion(
+                nodo_inicio,
                 nodo_objetivo
             )
+
+            return (
+                solucion,
+                nodos_expandidos,
+                raiz_inicial,
+                raiz_objetivo
+            )
+
+    # ==========================================
+    # NO HAY SOLUCIÓN
+    # ==========================================
 
     return (
         None,
         nodos_expandidos,
-        nodo_inicial,
-        nodo_objetivo
+        raiz_inicial,
+        raiz_objetivo
     )
 
 
@@ -96,27 +129,35 @@ def expandir(
     problema,
     cola,
     visitados_actual,
-    visitados_otro
+    nodos_actual,
+    visitados_otro,
+    nodos_otro
 ):
 
     if cola.esta_vacia():
         return None
 
-    # Sacamos el primero de la cola → BFS
     nodo = cola.desencolar()
 
-    for accion in problema.acciones(nodo.estado):
+    # ==========================================
+    # GENERAR SUCESORES
+    # ==========================================
+
+    for accion in problema.acciones(
+        nodo.estado
+    ):
 
         nuevo_estado = problema.resultado(
             nodo.estado,
             accion
         )
 
-        # ¿El otro árbol ya llegó a este estado?
+        # ==========================================
+        # ENCUENTRO DE LOS DOS ÁRBOLES
+        # ==========================================
+
         if nuevo_estado in visitados_otro:
 
-            nodo_otro = visitados_otro[nuevo_estado]
-
             hijo = Nodo(
                 nuevo_estado,
                 nodo,
@@ -125,11 +166,21 @@ def expandir(
 
             nodo.agregar_hijo(hijo)
 
-            return hijo, nodo_otro
+            nodos_actual[nuevo_estado] = hijo
 
-        # Si este árbol todavía no ha visitado el estado
+            return (
+                hijo,
+                nodos_otro[nuevo_estado]
+            )
+
+        # ==========================================
+        # ESTADO NUEVO
+        # ==========================================
+
         if nuevo_estado not in visitados_actual:
 
+            visitados_actual.add(nuevo_estado)
+
             hijo = Nodo(
                 nuevo_estado,
                 nodo,
@@ -138,9 +189,53 @@ def expandir(
 
             nodo.agregar_hijo(hijo)
 
-            visitados_actual[nuevo_estado] = hijo
+            nodos_actual[nuevo_estado] = hijo
 
-            # Se añade al final → mantiene BFS
             cola.encolar(hijo)
 
     return None
+
+
+def construir_solucion(
+    nodo_inicio,
+    nodo_objetivo
+):
+
+    # ==========================================
+    # RECORRER EL ÁRBOL DEL OBJETIVO
+    # DESDE EL ENCUENTRO HASTA EL OBJETIVO
+    # ==========================================
+
+    nodo = nodo_objetivo
+
+    padre = nodo_inicio
+
+    while nodo.padre is not None:
+
+        # La acción almacenada en 'nodo' corresponde
+        # al movimiento:
+        #
+        # nodo.padre -> nodo
+        #
+        # Pero nosotros necesitamos recorrer:
+        #
+        # nodo -> nodo.padre
+        #
+        # Por eso usamos la acción contraria.
+
+        accion = Nodo._accion_contraria_de(
+            nodo.accion
+        )
+
+        hijo = Nodo(
+            nodo.padre.estado,
+            padre,
+            accion
+        )
+
+        padre.agregar_hijo(hijo)
+
+        padre = hijo
+        nodo = nodo.padre
+
+    return padre

@@ -52,7 +52,7 @@ def main():
     print("Tamaño:", f"{FILAS} x {COLUMNAS}")
     print("Inicio:", problema.inicial)
     print("Objetivo:", problema.objetivo)
-    print("Factor de ramificación máximo: b = 4")
+    print("Factor de ramificación máximo: b = ", factor_ramificacion)
     print("d = profundidad de la solución")
     print("m = profundidad máxima del árbol de búsqueda")
 
