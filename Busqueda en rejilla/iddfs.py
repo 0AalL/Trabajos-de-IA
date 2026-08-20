@@ -9,7 +9,10 @@ def dfs_limitado(problema, limite):
     pila = Pila()
     pila.apilar((raiz, 0))
 
-    visitados = {problema.inicial}
+    # Estado -> menor profundidad conocida
+    visitados = {
+        problema.inicial: 0
+    }
 
     nodos_expandidos = 0
 
@@ -27,7 +30,6 @@ def dfs_limitado(problema, limite):
 
         acciones = problema.acciones(nodo.estado)
 
-        # Mantener el orden original de DFS
         acciones.reverse()
 
         for accion in acciones:
@@ -37,10 +39,15 @@ def dfs_limitado(problema, limite):
                 accion
             )
 
-            if nuevo_estado in visitados:
+            nueva_profundidad = profundidad + 1
+
+            # Si ya llegamos a este estado a una profundidad
+            # menor o igual, no necesitamos volver a explorarlo.
+            if (nuevo_estado in visitados and
+                    visitados[nuevo_estado] <= nueva_profundidad):
                 continue
 
-            visitados.add(nuevo_estado)
+            visitados[nuevo_estado] = nueva_profundidad
 
             hijo = Nodo(
                 nuevo_estado,
@@ -51,7 +58,7 @@ def dfs_limitado(problema, limite):
             nodo.agregar_hijo(hijo)
 
             pila.apilar(
-                (hijo, profundidad + 1)
+                (hijo, nueva_profundidad)
             )
 
     return None, nodos_expandidos, raiz
