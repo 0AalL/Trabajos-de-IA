@@ -169,7 +169,7 @@ def main():
         problema,
         f"O({factor_ramificacion}^d)",
         f"O({factor_ramificacion}d)",
-        mostrar_arbol=False
+        mostrar_arbol=True
     )
 
     salida_total += salida

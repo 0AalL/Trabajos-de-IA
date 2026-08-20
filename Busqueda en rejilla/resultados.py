@@ -42,7 +42,7 @@ def mostrar_resultado(
     profundidad_consola=15,
     mostrar_arbol=True
 ):
-
+    print("mostrar_resultado recibió:", resultado)
     salida = ""
     salida_consola = ""
 

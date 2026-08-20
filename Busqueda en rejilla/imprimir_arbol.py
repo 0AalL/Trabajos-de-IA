@@ -1,5 +1,5 @@
 def imprimir_arbol(raiz, profundidad_maxima=15):
-
+    
     lineas = []
 
     lineas.append("")
