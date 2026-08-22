@@ -224,62 +224,6 @@ def guardar_resultados(
 
             f.write("\n")
 
-        # ÁRBOL
-
-        f.write("\n")
-        f.write("=" * 70 + "\n")
-        f.write("ÁRBOL DE BÚSQUEDA EXPANDIDO\n")
-        f.write("=" * 70 + "\n\n")
-
-        for nodo in algoritmo.arbol:
-
-            f.write(
-                f"NODO {nodo.id}\n"
-            )
-
-            if nodo.padre:
-
-                f.write(
-                    f"Padre: "
-                    f"{nodo.padre.id}\n"
-                )
-
-            else:
-
-                f.write(
-                    "Padre: NINGUNO\n"
-                )
-
-            f.write(
-                f"Movimiento: "
-                f"{nodo.movimiento or 'INICIAL'}\n"
-            )
-
-            h = algoritmo.heuristica.calcular(
-                nodo.estado,
-                algoritmo.problema.meta
-            )
-
-            f.write(
-                f"g(n) = {nodo.costo}\n"
-            )
-
-            f.write(
-                f"h(n) = {h}\n"
-            )
-
-            f.write(
-                f"f(n) = "
-                f"{nodo.costo + h}\n"
-            )
-
-            f.write("Estado:\n")
-
-            f.write(
-                estado_a_texto(nodo.estado)
-            )
-
-            f.write("-" * 70 + "\n")
 
 
 def ejecutar_algoritmo(
