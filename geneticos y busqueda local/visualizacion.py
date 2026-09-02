@@ -556,14 +556,27 @@ def generar_graficos(historial, poblacion_final):
 # VISUALIZACIÓN DE LA SOLUCIÓN FINAL
 # ============================================================
 
+
 def visualizar_solucion(individuo):
+    """
+    Genera y guarda una imagen de la solución final.
+
+    La matriz de iluminación es obtenida directamente mediante
+    calcular_iluminacion(), utilizando la misma evaluación continua
+    empleada por el algoritmo genético.
+    """
 
     crear_carpetas()
 
-    # Importación local para evitar problemas circulares
-    from iluminacion import generar_mapa_iluminacion
+    # ==========================================
+    # CALCULAR MAPA DE ILUMINACIÓN
+    # ==========================================
 
-    mapa = generar_mapa_iluminacion(individuo)
+    mapa = calcular_iluminacion(individuo)
+
+    # ==========================================
+    # CREAR FIGURA
+    # ==========================================
 
     plt.figure(figsize=(10, 8))
 
@@ -575,38 +588,68 @@ def visualizar_solucion(individuo):
     )
 
     plt.colorbar(
-        label="Iluminación (lux)"
+        label="Iluminación"
     )
 
-    # Dibujar los focos
+    # ==========================================
+    # MOSTRAR POSICIONES DE LOS FOCOS
+    # ==========================================
+
     for i in range(NUM_FOCOS):
 
         x = individuo[i * 3]
         y = individuo[i * 3 + 1]
         potencia = individuo[i * 3 + 2]
 
-        if potencia > 0:
+        # No mostrar focos apagados
+        if potencia == 0:
+            continue
 
-            plt.scatter(
-                x,
-                y,
-                s=100,
-                edgecolors="black",
-                linewidths=1.5
-            )
+        plt.scatter(
+            x,
+            y,
+            s=100,
+            marker="o",
+            edgecolors="black",
+            label=f"Foco {i + 1}: {potencia} W"
+        )
 
-            plt.text(
-                x,
-                y,
-                f" F{i + 1}\n {potencia} W",
-                fontsize=9
-            )
+        plt.text(
+            x,
+            y,
+            f" {i + 1}",
+            fontsize=10,
+            fontweight="bold"
+        )
+
+    # ==========================================
+    # CONFIGURACIÓN DEL GRÁFICO
+    # ==========================================
 
     plt.xlabel("Ancho (m)")
     plt.ylabel("Largo (m)")
-    plt.title("Distribución espacial de la solución final")
+
+    plt.title(
+        "Mapa de iluminación de la solución final"
+    )
+
+    plt.xlim(0, ANCHO)
+    plt.ylim(0, LARGO)
+
+    plt.grid(
+        True,
+        alpha=0.3
+    )
+
+    plt.legend(
+        loc="upper right"
+    )
 
     plt.tight_layout()
+
+    # ==========================================
+    # GUARDAR
+    # ==========================================
 
     ruta = os.path.join(
         CARPETA_RESULTADOS,
@@ -615,11 +658,12 @@ def visualizar_solucion(individuo):
 
     plt.savefig(
         ruta,
-        dpi=300
+        dpi=300,
+        bbox_inches="tight"
     )
 
     plt.close()
 
     print(
-        f"Imagen de la solución final guardada en: {ruta}"
+        f"Solución final guardada en: {ruta}"
     )
