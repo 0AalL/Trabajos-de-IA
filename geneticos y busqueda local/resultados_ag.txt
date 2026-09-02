@@ -1,0 +1,233 @@
+======================================================================
+RESULTADOS DEL ALGORITMO GENÉTICO
+======================================================================
+
+Tamaño de población: 100
+Número de generaciones: 200
+Número de focos: 6
+Espacio de búsqueda: continuo
+Potencia 0 W = foco apagado
+
+======================================================================
+EVOLUCIÓN DE LAS GENERACIONES
+======================================================================
+
+Generación   1 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   2 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   3 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   4 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   5 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   6 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   7 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   8 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación   9 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  10 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  11 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  12 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  13 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  14 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  15 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  16 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  17 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  18 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  19 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  20 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  21 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  22 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  23 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  24 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  25 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  26 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  27 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  28 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  29 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  30 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  31 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  32 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  33 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  34 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  35 | Fitness actual: 0.329802 | Mejor global: 0.329802
+Generación  36 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  37 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  38 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  39 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  40 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  41 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  42 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  43 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  44 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  45 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  46 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  47 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  48 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  49 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  50 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  51 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  52 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  53 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  54 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  55 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  56 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  57 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  58 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  59 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  60 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  61 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  62 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  63 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  64 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  65 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  66 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  67 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  68 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  69 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  70 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  71 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  72 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  73 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  74 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  75 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  76 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  77 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  78 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  79 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  80 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  81 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  82 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  83 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  84 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  85 | Fitness actual: 0.335396 | Mejor global: 0.335396
+Generación  86 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  87 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  88 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  89 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  90 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  91 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  92 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  93 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  94 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  95 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  96 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  97 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  98 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación  99 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 100 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 101 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 102 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 103 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 104 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 105 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 106 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 107 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 108 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 109 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 110 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 111 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 112 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 113 | Fitness actual: 0.337031 | Mejor global: 0.337031
+Generación 114 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 115 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 116 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 117 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 118 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 119 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 120 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 121 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 122 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 123 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 124 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 125 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 126 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 127 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 128 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 129 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 130 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 131 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 132 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 133 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 134 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 135 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 136 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 137 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 138 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 139 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 140 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 141 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 142 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 143 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 144 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 145 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 146 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 147 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 148 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 149 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 150 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 151 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 152 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 153 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 154 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 155 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 156 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 157 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 158 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 159 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 160 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 161 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 162 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 163 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 164 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 165 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 166 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 167 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 168 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 169 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 170 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 171 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 172 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 173 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 174 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 175 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 176 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 177 | Fitness actual: 0.346115 | Mejor global: 0.346115
+Generación 178 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 179 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 180 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 181 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 182 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 183 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 184 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 185 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 186 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 187 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 188 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 189 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 190 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 191 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 192 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 193 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 194 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 195 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 196 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 197 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 198 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 199 | Fitness actual: 0.353198 | Mejor global: 0.353198
+Generación 200 | Fitness actual: 0.353198 | Mejor global: 0.353198
+
+======================================================================
+MEJOR SOLUCIÓN ENCONTRADA
+======================================================================
+
+Foco 1: x=4.1565 m | y=5.7051 m | potencia=30 W | ENCENDIDO
+Foco 2: x=5.4470 m | y=3.9987 m | potencia=50 W | ENCENDIDO
+Foco 3: x=4.1367 m | y=2.0543 m | potencia=60 W | ENCENDIDO
+Foco 4: x=3.5205 m | y=4.4122 m | potencia=10 W | ENCENDIDO
+Foco 5: x=1.2194 m | y=3.3588 m | potencia=60 W | ENCENDIDO
+Foco 6: x=4.0836 m | y=4.7099 m | potencia=10 W | ENCENDIDO
+
+Fitness final = 0.353198
+
+Visualización guardada en: resultados\solucion_final.png
+
+======================================================================
+FIN DEL EXPERIMENTO
+======================================================================
