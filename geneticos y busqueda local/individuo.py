@@ -3,39 +3,32 @@
 import random
 
 from configuracion import (
-    ANCHO,
-    LARGO,
     POTENCIAS,
-    NUM_FOCOS
+    NUM_FOCOS,
+    NUM_CUADRICULAS
 )
 
 
 # ==========================================
-# GENERAR COORDENADA X
+# OBTENER CUADRÍCULA DISPONIBLE
 # ==========================================
 
-def obtener_x():
+def obtener_cuadricula(cuadriculas_usadas):
 
-    return random.uniform(
-        0,
-        ANCHO
-    )
+    disponibles = [
+        cuadricula
+        for cuadricula in range(
+            1,
+            NUM_CUADRICULAS + 1
+        )
+        if cuadricula not in cuadriculas_usadas
+    ]
 
-
-# ==========================================
-# GENERAR COORDENADA Y
-# ==========================================
-
-def obtener_y():
-
-    return random.uniform(
-        0,
-        LARGO
-    )
+    return random.choice(disponibles)
 
 
 # ==========================================
-# GENERAR POTENCIA
+# OBTENER POTENCIA
 # ==========================================
 
 def obtener_potencia():
@@ -53,17 +46,22 @@ def crear_individuo():
 
     individuo = []
 
+    cuadriculas_usadas = set()
+
     for _ in range(NUM_FOCOS):
 
-        x = obtener_x()
+        cuadricula = obtener_cuadricula(
+            cuadriculas_usadas
+        )
 
-        y = obtener_y()
+        cuadriculas_usadas.add(
+            cuadricula
+        )
 
         potencia = obtener_potencia()
 
         individuo.extend([
-            x,
-            y,
+            cuadricula,
             potencia
         ])
 

@@ -1,669 +1,675 @@
+# main.py
 
-import os
-import numpy as np
-import matplotlib
+from poblacion import crear_poblacion
 
-# No abrir ventanas de Matplotlib
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt
-
-from iluminacion import calcular_iluminacion
 from fitness import calcular_fitness
+
+from seleccion import seleccionar_padres
+
+from crossover import crossover
+
+from mutacion import mutar
+
+from visualizacion import (
+    generar_graficos,
+    visualizar_solucion,
+    obtener_datos_individuo
+)
+
+from iluminacion import (
+    cuadricula_a_coordenadas
+)
+
 from configuracion import (
-    ANCHO,
-    LARGO,
-    NUM_FOCOS,
-    ILUMINACION_MINIMA
+    TAM_POBLACION,
+    NUM_GENERACIONES,
+    NUM_FOCOS
 )
 
 
 # ============================================================
-# CONFIGURACIÓN DE CARPETAS
+# EJECUCIÓN DEL ALGORITMO GENÉTICO
 # ============================================================
 
-CARPETA_RESULTADOS = "resultados"
-CARPETA_GRAFICOS = os.path.join(CARPETA_RESULTADOS, "graficos")
+def ejecutar():
 
+    print("=" * 60)
 
-def crear_carpetas():
-    os.makedirs(CARPETA_RESULTADOS, exist_ok=True)
-    os.makedirs(CARPETA_GRAFICOS, exist_ok=True)
-
-
-# ============================================================
-# DATOS DE UN INDIVIDUO
-# ============================================================
-
-def obtener_datos_individuo(individuo):
-    """
-    Obtiene las principales métricas de un individuo.
-    """
-
-    iluminacion = calcular_iluminacion(individuo)
-
-    cobertura = np.mean(iluminacion >= ILUMINACION_MINIMA)
-
-    potencia_total = sum(
-        individuo[i * 3 + 2]
-        for i in range(NUM_FOCOS)
+    print(
+        "ALGORITMO GENÉTICO - "
+        "OPTIMIZACIÓN DE ILUMINACIÓN"
     )
 
-    focos_encendidos = sum(
-        1
-        for i in range(NUM_FOCOS)
-        if individuo[i * 3 + 2] > 0
-    )
+    print("=" * 60)
 
-    iluminacion_promedio = np.mean(iluminacion)
-    iluminacion_minima = np.min(iluminacion)
-    iluminacion_maxima = np.max(iluminacion)
+    # ========================================================
+    # POBLACIÓN INICIAL
+    # ========================================================
 
-    fitness = calcular_fitness(individuo)
+    poblacion = crear_poblacion()
 
-    return {
-        "fitness": fitness,
-        "cobertura": cobertura * 100,
-        "potencia": potencia_total,
-        "focos": focos_encendidos,
-        "iluminacion_promedio": iluminacion_promedio,
-        "iluminacion_minima": iluminacion_minima,
-        "iluminacion_maxima": iluminacion_maxima
+    mejor_global = None
+
+    mejor_fitness_global = -1
+
+    # ========================================================
+    # HISTORIAL
+    # ========================================================
+
+    historial = {
+
+        "generaciones": [],
+
+        "fitness": [],
+
+        "cobertura": [],
+
+        "potencia": [],
+
+        "focos": [],
+
+        "iluminacion_promedio": [],
+
+        "iluminacion_minima": [],
+
+        "iluminacion_maxima": []
     }
 
+    # ========================================================
+    # ARCHIVO DE RESULTADOS
+    # ========================================================
 
-# ============================================================
-# 1. EVOLUCIÓN DEL FITNESS
-# ============================================================
-
-def grafico_evolucion_fitness(historial):
-
-    generaciones = historial["generaciones"]
-    fitness = historial["fitness"]
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(
-        generaciones,
-        fitness,
-        linewidth=2
+    archivo = open(
+        "resultados_ag.txt",
+        "w",
+        encoding="utf-8"
     )
 
-    plt.xlabel("Generación")
-    plt.ylabel("Fitness")
-    plt.title("Evolución del fitness durante el algoritmo genético")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "01_evolucion_fitness.png"
-        ),
-        dpi=300
+    archivo.write(
+        "RESULTADOS DEL ALGORITMO GENÉTICO\n"
     )
 
-    plt.close()
-
-
-# ============================================================
-# 2. EVOLUCIÓN DE LA COBERTURA
-# ============================================================
-
-def grafico_evolucion_cobertura(historial):
-
-    generaciones = historial["generaciones"]
-    cobertura = historial["cobertura"]
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(
-        generaciones,
-        cobertura,
-        linewidth=2
+    archivo.write(
+        "=" * 60 +
+        "\n\n"
     )
 
-    plt.axhline(
-        100,
-        linestyle="--",
-        linewidth=1.5,
-        label="Cobertura completa"
-    )
+    # ========================================================
+    # CICLO PRINCIPAL
+    # ========================================================
 
-    plt.xlabel("Generación")
-    plt.ylabel("Cobertura (%)")
-    plt.title("Evolución de la cobertura de iluminación")
+    for generacion in range(
+        1,
+        NUM_GENERACIONES + 1
+    ):
 
-    plt.legend()
-    plt.grid(True, alpha=0.3)
+        # ====================================================
+        # EVALUAR POBLACIÓN
+        # ====================================================
 
-    plt.tight_layout()
+        fitnesses = [
+            calcular_fitness(
+                individuo
+            )
+            for individuo in poblacion
+        ]
 
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "02_evolucion_cobertura.png"
-        ),
-        dpi=300
-    )
+        # ====================================================
+        # SELECCIÓN
+        # ====================================================
 
-    plt.close()
-
-
-# ============================================================
-# 3. EVOLUCIÓN DE LA POTENCIA
-# ============================================================
-
-def grafico_evolucion_potencia(historial):
-
-    generaciones = historial["generaciones"]
-    potencia = historial["potencia"]
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(
-        generaciones,
-        potencia,
-        linewidth=2
-    )
-
-    plt.xlabel("Generación")
-    plt.ylabel("Potencia total (W)")
-    plt.title("Evolución de la potencia utilizada")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "03_evolucion_potencia.png"
-        ),
-        dpi=300
-    )
-
-    plt.close()
-
-
-# ============================================================
-# 4. EVOLUCIÓN DE LOS FOCOS ENCENDIDOS
-# ============================================================
-
-def grafico_evolucion_focos(historial):
-
-    generaciones = historial["generaciones"]
-    focos = historial["focos"]
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(
-        generaciones,
-        focos,
-        linewidth=2
-    )
-
-    plt.xlabel("Generación")
-    plt.ylabel("Focos encendidos")
-    plt.title("Evolución del número de focos encendidos")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "04_evolucion_focos.png"
-        ),
-        dpi=300
-    )
-
-    plt.close()
-
-
-# ============================================================
-# 5. EVOLUCIÓN DE LA ILUMINACIÓN
-# ============================================================
-
-def grafico_evolucion_iluminacion(historial):
-
-    generaciones = historial["generaciones"]
-
-    promedio = historial["iluminacion_promedio"]
-    minima = historial["iluminacion_minima"]
-    maxima = historial["iluminacion_maxima"]
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(
-        generaciones,
-        promedio,
-        linewidth=2,
-        label="Promedio"
-    )
-
-    plt.plot(
-        generaciones,
-        minima,
-        linewidth=2,
-        label="Mínima"
-    )
-
-    plt.plot(
-        generaciones,
-        maxima,
-        linewidth=2,
-        label="Máxima"
-    )
-
-    plt.axhline(
-        ILUMINACION_MINIMA,
-        linestyle="--",
-        linewidth=1.5,
-        label=f"Umbral mínimo ({ILUMINACION_MINIMA} lux)"
-    )
-
-    plt.xlabel("Generación")
-    plt.ylabel("Iluminación (lux)")
-    plt.title("Evolución de los niveles de iluminación")
-
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "05_evolucion_iluminacion.png"
-        ),
-        dpi=300
-    )
-
-    plt.close()
-
-
-# ============================================================
-# 6. DISTRIBUCIÓN DEL FITNESS
-# ============================================================
-
-def grafico_distribucion_fitness(poblacion_final):
-
-    fitnesses = [
-        calcular_fitness(individuo)
-        for individuo in poblacion_final
-    ]
-
-    plt.figure(figsize=(10, 6))
-
-    plt.hist(
-        fitnesses,
-        bins=15,
-        edgecolor="black"
-    )
-
-    plt.xlabel("Fitness")
-    plt.ylabel("Frecuencia")
-    plt.title("Distribución del fitness de la población final")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "06_distribucion_fitness.png"
-        ),
-        dpi=300
-    )
-
-    plt.close()
-
-
-# ============================================================
-# 7. DISTRIBUCIÓN DE LA POTENCIA
-# ============================================================
-
-def grafico_distribucion_potencia(poblacion_final):
-
-    potencias = []
-
-    for individuo in poblacion_final:
-
-        potencia = sum(
-            individuo[i * 3 + 2]
-            for i in range(NUM_FOCOS)
+        padre1, padre2 = (
+            seleccionar_padres(
+                poblacion,
+                fitnesses
+            )
         )
 
-        potencias.append(potencia)
+        # ====================================================
+        # CROSSOVER
+        # ====================================================
 
-    plt.figure(figsize=(10, 6))
-
-    plt.hist(
-        potencias,
-        bins=15,
-        edgecolor="black"
-    )
-
-    plt.xlabel("Potencia total (W)")
-    plt.ylabel("Frecuencia")
-    plt.title("Distribución de la potencia en la población final")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "07_distribucion_potencia.png"
-        ),
-        dpi=300
-    )
-
-    plt.close()
-
-
-# ============================================================
-# 8. FITNESS VS POTENCIA
-# ============================================================
-
-def grafico_fitness_vs_potencia(poblacion_final):
-
-    fitnesses = []
-    potencias = []
-
-    for individuo in poblacion_final:
-
-        fitnesses.append(
-            calcular_fitness(individuo)
+        hijo1, hijo2 = crossover(
+            padre1,
+            padre2
         )
 
-        potencia = sum(
-            individuo[i * 3 + 2]
-            for i in range(NUM_FOCOS)
+        # ====================================================
+        # MUTACIÓN
+        # ====================================================
+
+        hijo1 = mutar(
+            hijo1
         )
 
-        potencias.append(potencia)
+        hijo2 = mutar(
+            hijo2
+        )
 
-    plt.figure(figsize=(10, 6))
+        # ====================================================
+        # AGREGAR HIJOS
+        # ====================================================
 
-    plt.scatter(
-        potencias,
-        fitnesses,
-        alpha=0.7
+        poblacion.append(
+            hijo1
+        )
+
+        poblacion.append(
+            hijo2
+        )
+
+        # ====================================================
+        # ELIMINACIÓN
+        # ====================================================
+
+        while len(poblacion) > TAM_POBLACION:
+
+            fitnesses = [
+                calcular_fitness(
+                    individuo
+                )
+                for individuo in poblacion
+            ]
+
+            maximo = max(
+                fitnesses
+            )
+
+            pesos_eliminacion = [
+
+                maximo -
+                fitness +
+                0.000001
+
+                for fitness in fitnesses
+            ]
+
+            total = sum(
+                pesos_eliminacion
+            )
+
+            probabilidades = [
+
+                peso / total
+
+                for peso in
+                pesos_eliminacion
+            ]
+
+            # ================================================
+            # RULETA INVERSA
+            # ================================================
+
+            ruleta = []
+
+            for i, probabilidad in enumerate(
+                probabilidades
+            ):
+
+                cantidad = round(
+                    probabilidad * 100
+                )
+
+                for _ in range(
+                    cantidad
+                ):
+
+                    ruleta.append(
+                        i
+                    )
+
+            # ================================================
+            # GARANTIZAR 100 POSICIONES
+            # ================================================
+
+            if len(ruleta) == 0:
+
+                ruleta = list(
+                    range(
+                        len(poblacion)
+                    )
+                )
+
+            while len(ruleta) < 100:
+
+                ruleta.append(
+                    ruleta[-1]
+                )
+
+            while len(ruleta) > 100:
+
+                ruleta.pop()
+
+            import random
+
+            numero = random.randint(
+                1,
+                100
+            )
+
+            indice_eliminar = (
+                ruleta[numero - 1]
+            )
+
+            poblacion.pop(
+                indice_eliminar
+            )
+
+        # ====================================================
+        # MEJOR INDIVIDUO
+        # ====================================================
+
+        fitnesses = [
+            calcular_fitness(
+                individuo
+            )
+            for individuo in poblacion
+        ]
+
+        mejor_fitness = max(
+            fitnesses
+        )
+
+        indice_mejor = (
+            fitnesses.index(
+                mejor_fitness
+            )
+        )
+
+        mejor_actual = (
+            poblacion[
+                indice_mejor
+            ]
+        )
+
+        # ====================================================
+        # ACTUALIZAR MEJOR GLOBAL
+        # ====================================================
+
+        if (
+            mejor_fitness >
+            mejor_fitness_global
+        ):
+
+            mejor_fitness_global = (
+                mejor_fitness
+            )
+
+            mejor_global = (
+                mejor_actual.copy()
+            )
+
+        # ====================================================
+        # MÉTRICAS
+        # ====================================================
+
+        datos = (
+            obtener_datos_individuo(
+                mejor_actual
+            )
+        )
+
+        # ====================================================
+        # HISTORIAL
+        # ====================================================
+
+        historial[
+            "generaciones"
+        ].append(
+            generacion
+        )
+
+        historial[
+            "fitness"
+        ].append(
+            datos["fitness"]
+        )
+
+        historial[
+            "cobertura"
+        ].append(
+            datos["cobertura"]
+        )
+
+        historial[
+            "potencia"
+        ].append(
+            datos["potencia"]
+        )
+
+        historial[
+            "focos"
+        ].append(
+            datos["focos"]
+        )
+
+        historial[
+            "iluminacion_promedio"
+        ].append(
+            datos[
+                "iluminacion_promedio"
+            ]
+        )
+
+        historial[
+            "iluminacion_minima"
+        ].append(
+            datos[
+                "iluminacion_minima"
+            ]
+        )
+
+        historial[
+            "iluminacion_maxima"
+        ].append(
+            datos[
+                "iluminacion_maxima"
+            ]
+        )
+
+        # ====================================================
+        # TXT
+        # ====================================================
+
+        archivo.write(
+
+            f"Generación "
+            f"{generacion:03d} | "
+
+            f"Fitness: "
+            f"{datos['fitness']:.6f} | "
+
+            f"Cobertura: "
+            f"{datos['cobertura']:.2f}% | "
+
+            f"Potencia: "
+            f"{datos['potencia']} W | "
+
+            f"Focos: "
+            f"{datos['focos']} | "
+
+            f"Iluminación promedio: "
+            f"{datos['iluminacion_promedio']:.2f} lux | "
+
+            f"Mínima: "
+            f"{datos['iluminacion_minima']:.2f} lux | "
+
+            f"Máxima: "
+            f"{datos['iluminacion_maxima']:.2f} lux\n"
+        )
+
+        # ====================================================
+        # PROGRESO
+        # ====================================================
+
+        print(
+
+            f"Generación "
+            f"{generacion:03d} | "
+
+            f"Fitness = "
+            f"{datos['fitness']:.6f} | "
+
+            f"Cobertura = "
+            f"{datos['cobertura']:.2f}% | "
+
+            f"Potencia = "
+            f"{datos['potencia']} W"
+        )
+
+    # ========================================================
+    # RESULTADO FINAL
+    # ========================================================
+
+    datos_finales = (
+        obtener_datos_individuo(
+            mejor_global
+        )
     )
 
-    plt.xlabel("Potencia total (W)")
-    plt.ylabel("Fitness")
-    plt.title("Relación entre potencia y fitness")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "08_fitness_vs_potencia.png"
-        ),
-        dpi=300
+    archivo.write(
+        "\n"
     )
 
-    plt.close()
-
-
-# ============================================================
-# 9. FITNESS VS COBERTURA
-# ============================================================
-
-def grafico_fitness_vs_cobertura(poblacion_final):
-
-    fitnesses = []
-    coberturas = []
-
-    for individuo in poblacion_final:
-
-        datos = obtener_datos_individuo(individuo)
-
-        fitnesses.append(datos["fitness"])
-        coberturas.append(datos["cobertura"])
-
-    plt.figure(figsize=(10, 6))
-
-    plt.scatter(
-        coberturas,
-        fitnesses,
-        alpha=0.7
+    archivo.write(
+        "=" * 60 +
+        "\n"
     )
 
-    plt.xlabel("Cobertura (%)")
-    plt.ylabel("Fitness")
-    plt.title("Relación entre cobertura y fitness")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "09_fitness_vs_cobertura.png"
-        ),
-        dpi=300
+    archivo.write(
+        "MEJOR SOLUCIÓN ENCONTRADA\n"
     )
 
-    plt.close()
-
-
-# ============================================================
-# 10. COBERTURA VS POTENCIA
-# ============================================================
-
-def grafico_cobertura_vs_potencia(poblacion_final):
-
-    potencias = []
-    coberturas = []
-
-    for individuo in poblacion_final:
-
-        datos = obtener_datos_individuo(individuo)
-
-        potencias.append(datos["potencia"])
-        coberturas.append(datos["cobertura"])
-
-    plt.figure(figsize=(10, 6))
-
-    plt.scatter(
-        potencias,
-        coberturas,
-        alpha=0.7
+    archivo.write(
+        "=" * 60 +
+        "\n\n"
     )
 
-    plt.xlabel("Potencia total (W)")
-    plt.ylabel("Cobertura (%)")
-    plt.title("Relación entre potencia y cobertura")
-
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            CARPETA_GRAFICOS,
-            "10_cobertura_vs_potencia.png"
-        ),
-        dpi=300
+    archivo.write(
+        f"Fitness: "
+        f"{datos_finales['fitness']:.6f}\n"
     )
 
-    plt.close()
+    archivo.write(
+        f"Cobertura: "
+        f"{datos_finales['cobertura']:.2f}%\n"
+    )
 
+    archivo.write(
+        f"Potencia total: "
+        f"{datos_finales['potencia']} W\n"
+    )
 
-# ============================================================
-# GENERAR TODOS LOS GRÁFICOS
-# ============================================================
+    archivo.write(
+        f"Focos encendidos: "
+        f"{datos_finales['focos']}\n"
+    )
 
-def generar_graficos(historial, poblacion_final):
+    archivo.write(
+        f"Iluminación promedio: "
+        f"{datos_finales['iluminacion_promedio']:.2f} lux\n"
+    )
 
-    crear_carpetas()
+    archivo.write(
+        f"Iluminación mínima: "
+        f"{datos_finales['iluminacion_minima']:.2f} lux\n"
+    )
 
-    print("\nGenerando gráficos estadísticos...")
+    archivo.write(
+        f"Iluminación máxima: "
+        f"{datos_finales['iluminacion_maxima']:.2f} lux\n\n"
+    )
 
-    grafico_evolucion_fitness(historial)
+    # ========================================================
+    # INFORMACIÓN DE LOS FOCOS
+    # ========================================================
 
-    print("  [1/10] Evolución del fitness")
+    archivo.write(
+        "FOCOS:\n"
+    )
 
-    grafico_evolucion_cobertura(historial)
+    for i in range(
+        NUM_FOCOS
+    ):
 
-    print("  [2/10] Evolución de la cobertura")
+        cuadricula = (
+            mejor_global[
+                i * 2
+            ]
+        )
 
-    grafico_evolucion_potencia(historial)
+        potencia = (
+            mejor_global[
+                i * 2 + 1
+            ]
+        )
 
-    print("  [3/10] Evolución de la potencia")
+        x, y = (
+            cuadricula_a_coordenadas(
+                cuadricula
+            )
+        )
 
-    grafico_evolucion_focos(historial)
+        estado = (
+            "ENCENDIDO"
+            if potencia > 0
+            else "APAGADO"
+        )
 
-    print("  [4/10] Evolución de los focos")
+        archivo.write(
 
-    grafico_evolucion_iluminacion(historial)
+            f"Foco {i + 1}: "
 
-    print("  [5/10] Evolución de la iluminación")
+            f"Cuadrícula={cuadricula}, "
 
-    grafico_distribucion_fitness(poblacion_final)
+            f"Centro=("
+            f"{x:.2f}, "
+            f"{y:.2f}"
+            f"), "
 
-    print("  [6/10] Distribución del fitness")
+            f"Potencia={potencia} W, "
 
-    grafico_distribucion_potencia(poblacion_final)
+            f"Estado={estado}\n"
+        )
 
-    print("  [7/10] Distribución de potencia")
+    archivo.close()
 
-    grafico_fitness_vs_potencia(poblacion_final)
+    # ========================================================
+    # GRÁFICOS
+    # ========================================================
 
-    print("  [8/10] Fitness vs potencia")
+    print("\n")
 
-    grafico_fitness_vs_cobertura(poblacion_final)
-
-    print("  [9/10] Fitness vs cobertura")
-
-    grafico_cobertura_vs_potencia(poblacion_final)
-
-    print("  [10/10] Cobertura vs potencia")
-
-    print("\nTodos los gráficos fueron guardados en:")
+    print("=" * 60)
 
     print(
-        os.path.abspath(CARPETA_GRAFICOS)
+        "ANÁLISIS ESTADÍSTICO"
     )
 
+    print("=" * 60)
 
-# ============================================================
-# VISUALIZACIÓN DE LA SOLUCIÓN FINAL
-# ============================================================
-
-
-def visualizar_solucion(individuo):
-    """
-    Genera y guarda una imagen de la solución final.
-
-    La matriz de iluminación es obtenida directamente mediante
-    calcular_iluminacion(), utilizando la misma evaluación continua
-    empleada por el algoritmo genético.
-    """
-
-    crear_carpetas()
-
-    # ==========================================
-    # CALCULAR MAPA DE ILUMINACIÓN
-    # ==========================================
-
-    mapa = calcular_iluminacion(individuo)
-
-    # ==========================================
-    # CREAR FIGURA
-    # ==========================================
-
-    plt.figure(figsize=(10, 8))
-
-    plt.imshow(
-        mapa,
-        origin="lower",
-        extent=[0, ANCHO, 0, LARGO],
-        aspect="equal"
+    generar_graficos(
+        historial,
+        poblacion
     )
 
-    plt.colorbar(
-        label="Iluminación"
+    # ========================================================
+    # SOLUCIÓN FINAL
+    # ========================================================
+
+    visualizar_solucion(
+        mejor_global
     )
 
-    # ==========================================
-    # MOSTRAR POSICIONES DE LOS FOCOS
-    # ==========================================
+    # ========================================================
+    # MOSTRAR RESULTADO
+    # ========================================================
 
-    for i in range(NUM_FOCOS):
+    print("\n")
 
-        x = individuo[i * 3]
-        y = individuo[i * 3 + 1]
-        potencia = individuo[i * 3 + 2]
-
-        # No mostrar focos apagados
-        if potencia == 0:
-            continue
-
-        plt.scatter(
-            x,
-            y,
-            s=100,
-            marker="o",
-            edgecolors="black",
-            label=f"Foco {i + 1}: {potencia} W"
-        )
-
-        plt.text(
-            x,
-            y,
-            f" {i + 1}",
-            fontsize=10,
-            fontweight="bold"
-        )
-
-    # ==========================================
-    # CONFIGURACIÓN DEL GRÁFICO
-    # ==========================================
-
-    plt.xlabel("Ancho (m)")
-    plt.ylabel("Largo (m)")
-
-    plt.title(
-        "Mapa de iluminación de la solución final"
-    )
-
-    plt.xlim(0, ANCHO)
-    plt.ylim(0, LARGO)
-
-    plt.grid(
-        True,
-        alpha=0.3
-    )
-
-    plt.legend(
-        loc="upper right"
-    )
-
-    plt.tight_layout()
-
-    # ==========================================
-    # GUARDAR
-    # ==========================================
-
-    ruta = os.path.join(
-        CARPETA_RESULTADOS,
-        "solucion_final.png"
-    )
-
-    plt.savefig(
-        ruta,
-        dpi=300,
-        bbox_inches="tight"
-    )
-
-    plt.close()
+    print("=" * 60)
 
     print(
-        f"Solución final guardada en: {ruta}"
+        "MEJOR SOLUCIÓN ENCONTRADA"
     )
+
+    print("=" * 60)
+
+    print(
+        f"Fitness: "
+        f"{datos_finales['fitness']:.6f}"
+    )
+
+    print(
+        f"Cobertura: "
+        f"{datos_finales['cobertura']:.2f}%"
+    )
+
+    print(
+        f"Potencia total: "
+        f"{datos_finales['potencia']} W"
+    )
+
+    print(
+        f"Focos encendidos: "
+        f"{datos_finales['focos']}"
+    )
+
+    print(
+        f"Iluminación promedio: "
+        f"{datos_finales['iluminacion_promedio']:.2f} lux"
+    )
+
+    print(
+        f"Iluminación mínima: "
+        f"{datos_finales['iluminacion_minima']:.2f} lux"
+    )
+
+    print(
+        f"Iluminación máxima: "
+        f"{datos_finales['iluminacion_maxima']:.2f} lux"
+    )
+
+    print(
+        "\nUbicación de los focos:"
+    )
+
+    for i in range(
+        NUM_FOCOS
+    ):
+
+        cuadricula = (
+            mejor_global[
+                i * 2
+            ]
+        )
+
+        potencia = (
+            mejor_global[
+                i * 2 + 1
+            ]
+        )
+
+        x, y = (
+            cuadricula_a_coordenadas(
+                cuadricula
+            )
+        )
+
+        estado = (
+            "ENCENDIDO"
+            if potencia > 0
+            else "APAGADO"
+        )
+
+        print(
+
+            f"Foco {i + 1}: "
+
+            f"Cuadrícula {cuadricula} "
+
+            f"→ "
+
+            f"({x:.2f}, {y:.2f}) "
+
+            f"- "
+
+            f"{potencia} W "
+
+            f"- "
+
+            f"{estado}"
+        )
+
+    print(
+        "\nProceso terminado correctamente."
+    )
+
+
+# ============================================================
+# EJECUTAR
+# ============================================================
+
+if __name__ == "__main__":
+
+    ejecutar()

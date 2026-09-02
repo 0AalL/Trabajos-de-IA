@@ -1,15 +1,23 @@
-import random
+# main.py
 
 from poblacion import crear_poblacion
+
 from fitness import calcular_fitness
+
 from seleccion import seleccionar_padres
+
 from crossover import crossover
+
 from mutacion import mutar
 
 from visualizacion import (
     generar_graficos,
     visualizar_solucion,
     obtener_datos_individuo
+)
+
+from iluminacion import (
+    cuadricula_a_coordenadas
 )
 
 from configuracion import (
@@ -26,36 +34,50 @@ from configuracion import (
 def ejecutar():
 
     print("=" * 60)
-    print("ALGORITMO GENÉTICO - OPTIMIZACIÓN DE ILUMINACIÓN")
+
+    print(
+        "ALGORITMO GENÉTICO - "
+        "OPTIMIZACIÓN DE ILUMINACIÓN"
+    )
+
     print("=" * 60)
 
-    # --------------------------------------------------------
-    # CREAR POBLACIÓN INICIAL
-    # --------------------------------------------------------
+    # ========================================================
+    # POBLACIÓN INICIAL
+    # ========================================================
 
     poblacion = crear_poblacion()
 
     mejor_global = None
+
     mejor_fitness_global = -1
 
-    # --------------------------------------------------------
-    # HISTORIAL ESTADÍSTICO
-    # --------------------------------------------------------
+    # ========================================================
+    # HISTORIAL
+    # ========================================================
 
     historial = {
+
         "generaciones": [],
+
         "fitness": [],
+
         "cobertura": [],
+
         "potencia": [],
+
         "focos": [],
+
         "iluminacion_promedio": [],
+
         "iluminacion_minima": [],
+
         "iluminacion_maxima": []
     }
 
-    # --------------------------------------------------------
+    # ========================================================
     # ARCHIVO DE RESULTADOS
-    # --------------------------------------------------------
+    # ========================================================
 
     archivo = open(
         "resultados_ag.txt",
@@ -67,248 +89,380 @@ def ejecutar():
         "RESULTADOS DEL ALGORITMO GENÉTICO\n"
     )
 
-    archivo.write("=" * 60 + "\n\n")
+    archivo.write(
+        "=" * 60 +
+        "\n\n"
+    )
 
     # ========================================================
     # CICLO PRINCIPAL
     # ========================================================
 
-    for generacion in range(1, NUM_GENERACIONES + 1):
+    for generacion in range(
+        1,
+        NUM_GENERACIONES + 1
+    ):
 
-        # ----------------------------------------------------
-        # EVALUAR POBLACIÓN ACTUAL
-        # ----------------------------------------------------
+        # ====================================================
+        # EVALUAR POBLACIÓN
+        # ====================================================
 
         fitnesses = [
-            calcular_fitness(individuo)
+            calcular_fitness(
+                individuo
+            )
             for individuo in poblacion
         ]
 
-        # ----------------------------------------------------
+        # ====================================================
         # SELECCIÓN
-        # ----------------------------------------------------
+        # ====================================================
 
-        padre1, padre2 = seleccionar_padres(
-            poblacion,
-            fitnesses
+        padre1, padre2 = (
+            seleccionar_padres(
+                poblacion,
+                fitnesses
+            )
         )
 
-        # ----------------------------------------------------
-        # CRUZAMIENTO
-        # ----------------------------------------------------
+        # ====================================================
+        # CROSSOVER
+        # ====================================================
 
         hijo1, hijo2 = crossover(
             padre1,
             padre2
         )
 
-        # ----------------------------------------------------
+        # ====================================================
         # MUTACIÓN
-        # ----------------------------------------------------
+        # ====================================================
 
-        hijo1 = mutar(hijo1)
-        hijo2 = mutar(hijo2)
+        hijo1 = mutar(
+            hijo1
+        )
 
-        # ----------------------------------------------------
+        hijo2 = mutar(
+            hijo2
+        )
+
+        # ====================================================
         # AGREGAR HIJOS
-        # ----------------------------------------------------
+        # ====================================================
 
-        poblacion.append(hijo1)
-        poblacion.append(hijo2)
+        poblacion.append(
+            hijo1
+        )
 
-        # ----------------------------------------------------
-        # EVALUAR NUEVA POBLACIÓN
-        # ----------------------------------------------------
+        poblacion.append(
+            hijo2
+        )
 
-        fitnesses = [
-            calcular_fitness(individuo)
-            for individuo in poblacion
-        ]
-
-        # ----------------------------------------------------
-        # ELIMINACIÓN POR RULETA INVERSA
-        # ----------------------------------------------------
+        # ====================================================
+        # ELIMINACIÓN
+        # ====================================================
 
         while len(poblacion) > TAM_POBLACION:
 
             fitnesses = [
-                calcular_fitness(individuo)
+                calcular_fitness(
+                    individuo
+                )
                 for individuo in poblacion
             ]
 
-            maximo = max(fitnesses)
+            maximo = max(
+                fitnesses
+            )
 
             pesos_eliminacion = [
-                maximo - fitness + 0.000001
+
+                maximo -
+                fitness +
+                0.000001
+
                 for fitness in fitnesses
             ]
 
-            total = sum(pesos_eliminacion)
+            total = sum(
+                pesos_eliminacion
+            )
 
             probabilidades = [
+
                 peso / total
-                for peso in pesos_eliminacion
+
+                for peso in
+                pesos_eliminacion
             ]
 
-            # Crear ruleta de 100 posiciones
+            # ================================================
+            # RULETA INVERSA
+            # ================================================
+
             ruleta = []
 
-            for i, probabilidad in enumerate(probabilidades):
+            for i, probabilidad in enumerate(
+                probabilidades
+            ):
 
                 cantidad = round(
                     probabilidad * 100
                 )
 
-                for _ in range(cantidad):
-                    ruleta.append(i)
+                for _ in range(
+                    cantidad
+                ):
 
-            # Ajustar a exactamente 100 posiciones
+                    ruleta.append(
+                        i
+                    )
+
+            # ================================================
+            # GARANTIZAR 100 POSICIONES
+            # ================================================
+
             if len(ruleta) == 0:
-                ruleta = list(range(len(poblacion)))
+
+                ruleta = list(
+                    range(
+                        len(poblacion)
+                    )
+                )
 
             while len(ruleta) < 100:
-                ruleta.append(ruleta[-1])
+
+                ruleta.append(
+                    ruleta[-1]
+                )
 
             while len(ruleta) > 100:
+
                 ruleta.pop()
 
-            numero = random.randint(1, 100)
+            import random
 
-            indice_eliminar = ruleta[numero - 1]
+            numero = random.randint(
+                1,
+                100
+            )
 
-            poblacion.pop(indice_eliminar)
+            indice_eliminar = (
+                ruleta[numero - 1]
+            )
+
+            poblacion.pop(
+                indice_eliminar
+            )
 
         # ====================================================
-        # EVALUACIÓN DE LA GENERACIÓN RESULTANTE
+        # MEJOR INDIVIDUO
         # ====================================================
 
         fitnesses = [
-            calcular_fitness(individuo)
+            calcular_fitness(
+                individuo
+            )
             for individuo in poblacion
         ]
 
-        mejor_fitness = max(fitnesses)
-
-        indice_mejor = fitnesses.index(
-            mejor_fitness
+        mejor_fitness = max(
+            fitnesses
         )
 
-        mejor_actual = poblacion[indice_mejor]
+        indice_mejor = (
+            fitnesses.index(
+                mejor_fitness
+            )
+        )
 
-        # ----------------------------------------------------
+        mejor_actual = (
+            poblacion[
+                indice_mejor
+            ]
+        )
+
+        # ====================================================
         # ACTUALIZAR MEJOR GLOBAL
-        # ----------------------------------------------------
+        # ====================================================
 
-        if mejor_fitness > mejor_fitness_global:
+        if (
+            mejor_fitness >
+            mejor_fitness_global
+        ):
 
-            mejor_fitness_global = mejor_fitness
+            mejor_fitness_global = (
+                mejor_fitness
+            )
 
-            mejor_global = mejor_actual.copy()
+            mejor_global = (
+                mejor_actual.copy()
+            )
 
-        # ----------------------------------------------------
-        # OBTENER MÉTRICAS
-        # ----------------------------------------------------
+        # ====================================================
+        # MÉTRICAS
+        # ====================================================
 
-        datos = obtener_datos_individuo(
-            mejor_actual
+        datos = (
+            obtener_datos_individuo(
+                mejor_actual
+            )
         )
 
-        # ----------------------------------------------------
-        # GUARDAR HISTORIAL
-        # ----------------------------------------------------
+        # ====================================================
+        # HISTORIAL
+        # ====================================================
 
-        historial["generaciones"].append(
+        historial[
+            "generaciones"
+        ].append(
             generacion
         )
 
-        historial["fitness"].append(
+        historial[
+            "fitness"
+        ].append(
             datos["fitness"]
         )
 
-        historial["cobertura"].append(
+        historial[
+            "cobertura"
+        ].append(
             datos["cobertura"]
         )
 
-        historial["potencia"].append(
+        historial[
+            "potencia"
+        ].append(
             datos["potencia"]
         )
 
-        historial["focos"].append(
+        historial[
+            "focos"
+        ].append(
             datos["focos"]
         )
 
-        historial["iluminacion_promedio"].append(
-            datos["iluminacion_promedio"]
+        historial[
+            "iluminacion_promedio"
+        ].append(
+            datos[
+                "iluminacion_promedio"
+            ]
         )
 
-        historial["iluminacion_minima"].append(
-            datos["iluminacion_minima"]
+        historial[
+            "iluminacion_minima"
+        ].append(
+            datos[
+                "iluminacion_minima"
+            ]
         )
 
-        historial["iluminacion_maxima"].append(
-            datos["iluminacion_maxima"]
+        historial[
+            "iluminacion_maxima"
+        ].append(
+            datos[
+                "iluminacion_maxima"
+            ]
         )
 
-        # ----------------------------------------------------
-        # GUARDAR EN TXT
-        # ----------------------------------------------------
+        # ====================================================
+        # TXT
+        # ====================================================
 
         archivo.write(
-            f"Generación {generacion:03d} | "
-            f"Fitness: {datos['fitness']:.6f} | "
-            f"Cobertura: {datos['cobertura']:.2f}% | "
-            f"Potencia: {datos['potencia']} W | "
-            f"Focos: {datos['focos']} | "
+
+            f"Generación "
+            f"{generacion:03d} | "
+
+            f"Fitness: "
+            f"{datos['fitness']:.6f} | "
+
+            f"Cobertura: "
+            f"{datos['cobertura']:.2f}% | "
+
+            f"Potencia: "
+            f"{datos['potencia']} W | "
+
+            f"Focos: "
+            f"{datos['focos']} | "
+
             f"Iluminación promedio: "
             f"{datos['iluminacion_promedio']:.2f} lux | "
+
             f"Mínima: "
             f"{datos['iluminacion_minima']:.2f} lux | "
+
             f"Máxima: "
             f"{datos['iluminacion_maxima']:.2f} lux\n"
         )
 
-        # ----------------------------------------------------
-        # MOSTRAR PROGRESO
-        # ----------------------------------------------------
+        # ====================================================
+        # PROGRESO
+        # ====================================================
 
         print(
-            f"Generación {generacion:03d} | "
-            f"Fitness = {datos['fitness']:.6f} | "
-            f"Cobertura = {datos['cobertura']:.2f}% | "
-            f"Potencia = {datos['potencia']} W"
+
+            f"Generación "
+            f"{generacion:03d} | "
+
+            f"Fitness = "
+            f"{datos['fitness']:.6f} | "
+
+            f"Cobertura = "
+            f"{datos['cobertura']:.2f}% | "
+
+            f"Potencia = "
+            f"{datos['potencia']} W"
         )
 
     # ========================================================
-    # FINALIZAR ARCHIVO
+    # RESULTADO FINAL
     # ========================================================
 
-    archivo.write("\n")
-    archivo.write("=" * 60 + "\n")
-    archivo.write("MEJOR SOLUCIÓN ENCONTRADA\n")
-    archivo.write("=" * 60 + "\n\n")
-
-    # --------------------------------------------------------
-    # DATOS DE LA MEJOR SOLUCIÓN
-    # --------------------------------------------------------
-
-    datos_finales = obtener_datos_individuo(
-        mejor_global
+    datos_finales = (
+        obtener_datos_individuo(
+            mejor_global
+        )
     )
 
     archivo.write(
-        f"Fitness: {datos_finales['fitness']:.6f}\n"
+        "\n"
     )
 
     archivo.write(
-        f"Cobertura: {datos_finales['cobertura']:.2f}%\n"
+        "=" * 60 +
+        "\n"
     )
 
     archivo.write(
-        f"Potencia total: {datos_finales['potencia']} W\n"
+        "MEJOR SOLUCIÓN ENCONTRADA\n"
     )
 
     archivo.write(
-        f"Focos encendidos: {datos_finales['focos']}\n"
+        "=" * 60 +
+        "\n\n"
+    )
+
+    archivo.write(
+        f"Fitness: "
+        f"{datos_finales['fitness']:.6f}\n"
+    )
+
+    archivo.write(
+        f"Cobertura: "
+        f"{datos_finales['cobertura']:.2f}%\n"
+    )
+
+    archivo.write(
+        f"Potencia total: "
+        f"{datos_finales['potencia']} W\n"
+    )
+
+    archivo.write(
+        f"Focos encendidos: "
+        f"{datos_finales['focos']}\n"
     )
 
     archivo.write(
@@ -326,17 +480,35 @@ def ejecutar():
         f"{datos_finales['iluminacion_maxima']:.2f} lux\n\n"
     )
 
-    archivo.write("FOCOS:\n")
-
-    # --------------------------------------------------------
+    # ========================================================
     # INFORMACIÓN DE LOS FOCOS
-    # --------------------------------------------------------
+    # ========================================================
 
-    for i in range(NUM_FOCOS):
+    archivo.write(
+        "FOCOS:\n"
+    )
 
-        x = mejor_global[i * 3]
-        y = mejor_global[i * 3 + 1]
-        potencia = mejor_global[i * 3 + 2]
+    for i in range(
+        NUM_FOCOS
+    ):
+
+        cuadricula = (
+            mejor_global[
+                i * 2
+            ]
+        )
+
+        potencia = (
+            mejor_global[
+                i * 2 + 1
+            ]
+        )
+
+        x, y = (
+            cuadricula_a_coordenadas(
+                cuadricula
+            )
+        )
 
         estado = (
             "ENCENDIDO"
@@ -345,22 +517,35 @@ def ejecutar():
         )
 
         archivo.write(
+
             f"Foco {i + 1}: "
-            f"X={x:.2f} m, "
-            f"Y={y:.2f} m, "
+
+            f"Cuadrícula={cuadricula}, "
+
+            f"Centro=("
+            f"{x:.2f}, "
+            f"{y:.2f}"
+            f"), "
+
             f"Potencia={potencia} W, "
+
             f"Estado={estado}\n"
         )
 
     archivo.close()
 
     # ========================================================
-    # GENERAR GRÁFICOS ESTADÍSTICOS
+    # GRÁFICOS
     # ========================================================
 
     print("\n")
+
     print("=" * 60)
-    print("ANÁLISIS ESTADÍSTICO")
+
+    print(
+        "ANÁLISIS ESTADÍSTICO"
+    )
+
     print("=" * 60)
 
     generar_graficos(
@@ -369,7 +554,7 @@ def ejecutar():
     )
 
     # ========================================================
-    # GENERAR IMAGEN DE LA SOLUCIÓN FINAL
+    # SOLUCIÓN FINAL
     # ========================================================
 
     visualizar_solucion(
@@ -377,12 +562,17 @@ def ejecutar():
     )
 
     # ========================================================
-    # MOSTRAR RESULTADO FINAL
+    # MOSTRAR RESULTADO
     # ========================================================
 
     print("\n")
+
     print("=" * 60)
-    print("MEJOR SOLUCIÓN ENCONTRADA")
+
+    print(
+        "MEJOR SOLUCIÓN ENCONTRADA"
+    )
+
     print("=" * 60)
 
     print(
@@ -420,13 +610,31 @@ def ejecutar():
         f"{datos_finales['iluminacion_maxima']:.2f} lux"
     )
 
-    print("\nUbicación de los focos:")
+    print(
+        "\nUbicación de los focos:"
+    )
 
-    for i in range(NUM_FOCOS):
+    for i in range(
+        NUM_FOCOS
+    ):
 
-        x = mejor_global[i * 3]
-        y = mejor_global[i * 3 + 1]
-        potencia = mejor_global[i * 3 + 2]
+        cuadricula = (
+            mejor_global[
+                i * 2
+            ]
+        )
+
+        potencia = (
+            mejor_global[
+                i * 2 + 1
+            ]
+        )
+
+        x, y = (
+            cuadricula_a_coordenadas(
+                cuadricula
+            )
+        )
 
         estado = (
             "ENCENDIDO"
@@ -435,13 +643,27 @@ def ejecutar():
         )
 
         print(
+
             f"Foco {i + 1}: "
-            f"({x:.2f}, {y:.2f}) - "
-            f"{potencia} W - "
+
+            f"Cuadrícula {cuadricula} "
+
+            f"→ "
+
+            f"({x:.2f}, {y:.2f}) "
+
+            f"- "
+
+            f"{potencia} W "
+
+            f"- "
+
             f"{estado}"
         )
 
-    print("\nProceso terminado correctamente.")
+    print(
+        "\nProceso terminado correctamente."
+    )
 
 
 # ============================================================
@@ -449,4 +671,5 @@ def ejecutar():
 # ============================================================
 
 if __name__ == "__main__":
+
     ejecutar()

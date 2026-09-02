@@ -7,22 +7,53 @@ from configuracion import (
     LARGO,
     A,
     B,
-    NUM_FOCOS
+    NUM_FOCOS,
+    NUM_COLUMNAS
 )
 
 
+# ==========================================
+# CUADRÍCULA → COORDENADAS
+# ==========================================
+
+def cuadricula_a_coordenadas(cuadricula):
+
+    # Convertir a índice empezando desde 0
+
+    indice = cuadricula - 1
+
+    # Obtener columna
+
+    columna = (
+        indice %
+        NUM_COLUMNAS
+    )
+
+    # Obtener fila
+
+    fila = (
+        indice //
+        NUM_COLUMNAS
+    )
+
+    # Centro de la cuadrícula
+
+    x = columna + 0.5
+
+    y = fila + 0.5
+
+    return x, y
+
+
+# ==========================================
+# CALCULAR ILUMINACIÓN
+# ==========================================
+
 def calcular_iluminacion(individuo):
 
-    """
-    Calcula la iluminación sobre toda
-    la superficie de la habitación.
-
-    Las coordenadas de los focos son continuas.
-    """
-
-    # ==========================================
-    # ESPACIO CONTINUO PARA LA EVALUACIÓN
-    # ==========================================
+    # ======================================
+    # MALLA DE EVALUACIÓN
+    # ======================================
 
     x = np.linspace(
         0,
@@ -46,34 +77,39 @@ def calcular_iluminacion(individuo):
         dtype=float
     )
 
-    # ==========================================
-    # CALCULAR CONTRIBUCIÓN DE CADA FOCO
-    # ==========================================
+    # ======================================
+    # CALCULAR CADA FOCO
+    # ======================================
 
     for i in range(NUM_FOCOS):
 
-        x_foco = individuo[
-            i * 3
-        ]
-
-        y_foco = individuo[
-            i * 3 + 1
+        cuadricula = individuo[
+            i * 2
         ]
 
         potencia = individuo[
-            i * 3 + 2
+            i * 2 + 1
         ]
 
-        # ======================================
+        # Obtener centro de la cuadrícula
+
+        x_foco, y_foco = (
+            cuadricula_a_coordenadas(
+                cuadricula
+            )
+        )
+
+        # ==================================
         # FOCO APAGADO
-        # ======================================
+        # ==================================
 
         if potencia == 0:
+
             continue
 
-        # ======================================
+        # ==================================
         # MODELO GAUSSIANO
-        # ======================================
+        # ==================================
 
         iluminacion += (
             potencia *

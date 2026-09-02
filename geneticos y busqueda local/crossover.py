@@ -3,86 +3,123 @@
 import random
 
 from configuracion import (
-    ANCHO,
-    LARGO,
-    POTENCIAS
+    NUM_CUADRICULAS
 )
 
 
-def experimento_100():
+# ==========================================
+# OBTENER CUADRÍCULA DISPONIBLE
+# ==========================================
 
-    vector = list(range(1, 101))
+def obtener_cuadricula_disponible(
+    cuadriculas_usadas
+):
 
-    numero = random.randint(1, 100)
+    disponibles = [
+        cuadricula
+        for cuadricula in range(
+            1,
+            NUM_CUADRICULAS + 1
+        )
+        if cuadricula not in cuadriculas_usadas
+    ]
 
-    return vector[numero - 1]
+    return random.choice(disponibles)
 
+
+# ==========================================
+# CROSSOVER
+# ==========================================
 
 def crossover(padre1, padre2):
 
     hijo1 = []
     hijo2 = []
 
-    for i in range(0, len(padre1), 3):
+    cuadriculas_hijo1 = set()
+    cuadriculas_hijo2 = set()
+
+    # ======================================
+    # RECORRER LOS FOCOS
+    # ======================================
+
+    for i in range(0, len(padre1), 2):
 
         # ==================================
-        # PORCENTAJE ALEATORIO
+        # CUADRÍCULA DEL PADRE 1
         # ==================================
 
-        numero = experimento_100()
-
-        p = numero / 100.0
+        cuadricula_padre1 = padre1[i]
 
         # ==================================
-        # COORDENADA X
+        # CUADRÍCULA DEL PADRE 2
         # ==================================
 
-        x1 = (
-            p * padre1[i]
-            +
-            (1 - p) * padre2[i]
+        cuadricula_padre2 = padre2[i]
+
+        # ==================================
+        # ELEGIR CUADRÍCULA PARA HIJO 1
+        # ==================================
+
+        if random.random() < 0.5:
+
+            cuadricula1 = cuadricula_padre1
+
+        else:
+
+            cuadricula1 = cuadricula_padre2
+
+        # ==================================
+        # EVITAR DUPLICADOS EN HIJO 1
+        # ==================================
+
+        if cuadricula1 in cuadriculas_hijo1:
+
+            cuadricula1 = (
+                obtener_cuadricula_disponible(
+                    cuadriculas_hijo1
+                )
+            )
+
+        cuadriculas_hijo1.add(
+            cuadricula1
         )
 
-        x2 = (
-            (1 - p) * padre1[i]
-            +
-            p * padre2[i]
+        # ==================================
+        # ELEGIR CUADRÍCULA PARA HIJO 2
+        # ==================================
+
+        if random.random() < 0.5:
+
+            cuadricula2 = cuadricula_padre1
+
+        else:
+
+            cuadricula2 = cuadricula_padre2
+
+        # ==================================
+        # EVITAR DUPLICADOS EN HIJO 2
+        # ==================================
+
+        if cuadricula2 in cuadriculas_hijo2:
+
+            cuadricula2 = (
+                obtener_cuadricula_disponible(
+                    cuadriculas_hijo2
+                )
+            )
+
+        cuadriculas_hijo2.add(
+            cuadricula2
         )
 
         # ==================================
-        # COORDENADA Y
+        # POTENCIAS
         # ==================================
 
-        y1 = (
-            p * padre1[i + 1]
-            +
-            (1 - p) * padre2[i + 1]
-        )
+        potencia_padre1 = padre1[i + 1]
 
-        y2 = (
-            (1 - p) * padre1[i + 1]
-            +
-            p * padre2[i + 1]
-        )
-
-        # ==================================
-        # LIMITAR AL ESPACIO
-        # ==================================
-
-        x1 = max(0, min(ANCHO, x1))
-        x2 = max(0, min(ANCHO, x2))
-
-        y1 = max(0, min(LARGO, y1))
-        y2 = max(0, min(LARGO, y2))
-
-        # ==================================
-        # POTENCIA
-        # ==================================
-        # Se selecciona una potencia válida.
-        # Puede ser 0 = foco apagado.
-
-        potencia_padre1 = padre1[i + 2]
-        potencia_padre2 = padre2[i + 2]
+        potencia_padre2 = padre2[i + 1]
 
         potencia1 = random.choice([
             potencia_padre1,
@@ -95,18 +132,20 @@ def crossover(padre1, padre2):
         ])
 
         # ==================================
-        # AGREGAR HIJOS
+        # CONSTRUIR HIJO 1
         # ==================================
 
         hijo1.extend([
-            x1,
-            y1,
+            cuadricula1,
             potencia1
         ])
 
+        # ==================================
+        # CONSTRUIR HIJO 2
+        # ==================================
+
         hijo2.extend([
-            x2,
-            y2,
+            cuadricula2,
             potencia2
         ])
 

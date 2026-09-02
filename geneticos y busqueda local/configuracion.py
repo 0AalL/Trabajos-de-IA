@@ -1,11 +1,24 @@
 # configuracion.py
 
+
 # ==========================================
-# DIMENSIONES DEL ESPACIO
+# DIMENSIONES DE LA HABITACIÓN
 # ==========================================
 
 ANCHO = 7.0
 LARGO = 8.0
+
+
+# ==========================================
+# CUADRÍCULA DE LA HABITACIÓN
+# ==========================================
+
+NUM_COLUMNAS = 7
+NUM_FILAS = 8
+
+NUM_CUADRICULAS = (
+    NUM_COLUMNAS * NUM_FILAS
+)
 
 
 # ==========================================
@@ -22,7 +35,8 @@ NUM_GENERACIONES = 200
 # ==========================================
 # POTENCIAS POSIBLES
 # ==========================================
-# 0 significa que el foco está apagado.
+
+# 0 significa foco apagado.
 
 POTENCIAS = [
     0,
@@ -66,7 +80,7 @@ PESO_COSTO = 0.30
 
 
 # ==========================================
-# CARPETA DE RESULTADOS
+# CARPETAS
 # ==========================================
 
 CARPETA_RESULTADOS = "resultados"
