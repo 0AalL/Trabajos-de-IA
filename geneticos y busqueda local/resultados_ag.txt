@@ -1,28 +1,223 @@
 RESULTADOS DEL ALGORITMO GENÉTICO
 ============================================================
 
-Generación 001 | Fitness: 0.339260 | Cobertura: 35.37% | Potencia: 250 W | Focos: 5 | Iluminación promedio: 22.08 lux | Mínima: 0.00 lux | Máxima: 69.20 lux
-Generación 002 | Fitness: 0.339260 | Cobertura: 35.37% | Potencia: 250 W | Focos: 5 | Iluminación promedio: 22.08 lux | Mínima: 0.00 lux | Máxima: 69.20 lux
-Generación 003 | Fitness: 0.339260 | Cobertura: 35.37% | Potencia: 250 W | Focos: 5 | Iluminación promedio: 22.08 lux | Mínima: 0.00 lux | Máxima: 69.20 lux
-Generación 004 | Fitness: 0.339260 | Cobertura: 35.37% | Potencia: 250 W | Focos: 5 | Iluminación promedio: 22.08 lux | Mínima: 0.00 lux | Máxima: 69.20 lux
-Generación 005 | Fitness: 0.339260 | Cobertura: 35.37% | Potencia: 250 W | Focos: 5 | Iluminación promedio: 22.08 lux | Mínima: 0.00 lux | Máxima: 69.20 lux
+Generación 001 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 002 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 003 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 004 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 005 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 006 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 007 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 008 | Fitness: 0.335000 | Cobertura: 40.71% | Potencia: 300 W | Focos: 6 | Iluminación promedio: 28.01 lux | Mínima: 0.01 lux | Máxima: 91.62 lux
+Generación 009 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 010 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 011 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 012 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 013 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 014 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 015 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 016 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 017 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 018 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 019 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 020 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 021 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 022 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 023 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 024 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 025 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 026 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 027 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 028 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 029 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 030 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 031 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 032 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 033 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 034 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 035 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 036 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 037 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 038 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 039 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 040 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 041 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 042 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 043 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 044 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 045 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 046 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 047 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 048 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 049 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 050 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 051 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 052 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 053 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 054 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 055 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 056 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 057 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 058 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 059 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 060 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 061 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 062 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 063 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 064 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 065 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 066 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 067 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 068 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 069 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 070 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 071 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 072 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 073 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 074 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 075 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 076 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 077 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 078 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 079 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 080 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 081 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 082 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 083 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 084 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 085 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 086 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 087 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 088 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 089 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 090 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 091 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 092 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 093 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 094 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 095 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 096 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 097 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 098 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 099 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 100 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 101 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 102 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 103 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 104 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 105 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 106 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 107 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 108 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 109 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 110 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 111 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 112 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 113 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 114 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 115 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 116 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 117 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 118 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 119 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 120 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 121 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 122 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 123 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 124 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 125 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 126 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 127 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 128 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 129 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 130 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 131 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 132 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 133 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 134 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 135 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 136 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 137 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 138 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 139 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 140 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 141 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 142 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 143 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 144 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 145 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 146 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 147 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 148 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 149 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 150 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 151 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 152 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 153 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 154 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 155 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 156 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 157 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 158 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 159 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 160 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 161 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 162 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 163 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 164 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 165 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 166 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 167 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 168 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 169 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 170 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 171 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 172 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 173 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 174 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 175 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 176 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 177 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 178 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 179 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 180 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 181 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 182 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 183 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 184 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 185 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 186 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 187 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 188 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 189 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 190 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 191 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 192 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 193 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 194 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 195 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 196 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 197 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 198 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 199 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
+Generación 200 | Fitness: 0.358198 | Cobertura: 34.50% | Potencia: 220 W | Focos: 6 | Iluminación promedio: 20.67 lux | Mínima: 0.00 lux | Máxima: 61.15 lux
 
 ============================================================
 MEJOR SOLUCIÓN ENCONTRADA
 ============================================================
 
-Fitness: 0.339260
-Cobertura: 35.37%
-Potencia total: 250 W
-Focos encendidos: 5
-Iluminación promedio: 22.08 lux
+Fitness: 0.358198
+Cobertura: 34.50%
+Potencia total: 220 W
+Focos encendidos: 6
+Iluminación promedio: 20.67 lux
 Iluminación mínima: 0.00 lux
-Iluminación máxima: 69.20 lux
+Iluminación máxima: 61.15 lux
 
 FOCOS:
-Foco 1: X=4.10 m, Y=3.95 m, Potencia=50 W, Estado=ENCENDIDO
-Foco 2: X=1.04 m, Y=0.76 m, Potencia=60 W, Estado=ENCENDIDO
-Foco 3: X=1.25 m, Y=4.51 m, Potencia=50 W, Estado=ENCENDIDO
-Foco 4: X=5.30 m, Y=5.46 m, Potencia=30 W, Estado=ENCENDIDO
-Foco 5: X=2.25 m, Y=1.96 m, Potencia=0 W, Estado=APAGADO
-Foco 6: X=1.82 m, Y=2.60 m, Potencia=60 W, Estado=ENCENDIDO
+Foco 1: X=5.28 m, Y=2.06 m, Potencia=30 W, Estado=ENCENDIDO
+Foco 2: X=4.08 m, Y=6.96 m, Potencia=10 W, Estado=ENCENDIDO
+Foco 3: X=4.68 m, Y=5.62 m, Potencia=30 W, Estado=ENCENDIDO
+Foco 4: X=2.50 m, Y=6.86 m, Potencia=50 W, Estado=ENCENDIDO
+Foco 5: X=4.64 m, Y=3.55 m, Potencia=40 W, Estado=ENCENDIDO
+Foco 6: X=1.55 m, Y=4.48 m, Potencia=60 W, Estado=ENCENDIDO
