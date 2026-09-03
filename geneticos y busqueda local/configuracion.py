@@ -1,17 +1,9 @@
-# configuracion.py
-
-
-# ==========================================
 # DIMENSIONES DE LA HABITACIÓN
-# ==========================================
 
 ANCHO = 7.0
 LARGO = 8.0
 
-
-# ==========================================
 # CUADRÍCULA DE LA HABITACIÓN
-# ==========================================
 
 NUM_COLUMNAS = 7
 NUM_FILAS = 8
@@ -20,16 +12,13 @@ NUM_CUADRICULAS = (
     NUM_COLUMNAS * NUM_FILAS
 )
 
-
-# ==========================================
 # ALGORITMO GENÉTICO
-# ==========================================
 
 NUM_FOCOS = 6
 
 TAM_POBLACION = 100
 
-NUM_GENERACIONES = 200
+NUM_GENERACIONES = 400
 
 
 # ==========================================
@@ -39,48 +28,27 @@ NUM_GENERACIONES = 200
 # 0 significa foco apagado.
 
 POTENCIAS = [
-    0,
-    10,
-    20,
-    30,
-    40,
-    50,
-    60
+    0,    10,    20,    30,    40,    50,    60
 ]
 
-
-# ==========================================
 # MODELO DE ILUMINACIÓN
-# ==========================================
 
 A = 1.5
 B = 1.2
 
-
-# ==========================================
 # ILUMINACIÓN MÍNIMA
-# ==========================================
 
-ILUMINACION_MINIMA = 30
+ILUMINACION_MINIMA = 20  # Lux
 
-
-# ==========================================
 # PROBABILIDAD DE MUTACIÓN
-# ==========================================
 
 PROB_MUTACION = 0.30
 
-
-# ==========================================
 # PESOS DEL FITNESS
-# ==========================================
 
-PESO_COBERTURA = 0.70
-PESO_COSTO = 0.30
+PESO_COBERTURA = 0.90
+PESO_COSTO = 0.10
 
-
-# ==========================================
 # CARPETAS
-# ==========================================
 
 CARPETA_RESULTADOS = "resultados"
