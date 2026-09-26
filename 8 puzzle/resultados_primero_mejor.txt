@@ -6,7 +6,7 @@ RESULTADOS
 ----------------------------------------------------------------------
 Número de movimientos: 62
 Nodos expandidos: 1499
-Tiempo de ejecución: 0.00808990 segundos
+Tiempo de ejecución: 0.01150770 segundos
 
 COMPLEJIDAD ASINTÓTICA
 ----------------------------------------------------------------------
