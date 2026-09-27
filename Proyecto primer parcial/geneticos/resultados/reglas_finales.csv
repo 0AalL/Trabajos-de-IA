@@ -1,4 +1,0 @@
-numero,regla,support,confidence,coverage,lift,fitness
-1,IF T_mean=high AND RH_mean=very_low AND Wind_mean=extreme AND DMC=high AND KBDI=extreme THEN incendio=nonexistent,3.830686658822254e-05,1.0,3.830686658822254e-05,12.892423976236383,12.892423976236383
-2,IF RH_mean=very_low AND Wind_mean=extreme AND DMC=high AND KBDI=extreme THEN incendio=nonexistent,3.830686658822254e-05,1.0,3.830686658822254e-05,12.892423976236383,12.892423976236383
-3,IF T_mean=high AND RH_mean=very_low AND Wind_mean=extreme AND DC=high AND KBDI=extreme THEN incendio=nonexistent,3.830686658822254e-05,1.0,3.830686658822254e-05,12.892423976236383,12.892423976236383

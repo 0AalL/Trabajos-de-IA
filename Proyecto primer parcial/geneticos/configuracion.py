@@ -530,19 +530,19 @@ SEMILLA = 42
 
 ARCHIVO_DATASET = "../dataset/dataset_numerico.csv"
 
-CARPETA_RESULTADOS = "resultados"
+CARPETA_RESULTADOS = "../reglas finales"
 
 ARCHIVO_DATASET_FUZZIFICADO = os.path.join(
     CARPETA_RESULTADOS,
-    "../resultados/dataset_fuzzificado.csv"
+    "../reglas finales/dataset_fuzzificado.csv"
 )
 
 ARCHIVO_REGLAS_ULTIMA_GENERACION = os.path.join(
     CARPETA_RESULTADOS,
-    "../resultados/reglas_ultima_generacion.csv"
+    "../reglas finales/reglas_ultima_generacion.csv"
 )
 
 ARCHIVO_REGLAS_FINALES = os.path.join(
     CARPETA_RESULTADOS,
-    "../resultados/reglas_finales.csv"
+    "../reglas finales/reglas_finales.csv"
 )
