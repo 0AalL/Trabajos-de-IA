@@ -1,4 +1,7 @@
-from configuracion import VARIABLES_ENTRADA
+from configuracion import (
+    VARIABLES_ENTRADA,
+    VARIABLE_SALIDA
+)
 
 
 # ============================================================
@@ -62,7 +65,7 @@ def grado_consecuente(
     ]
 
     return fila_grados[
-        "incendio"
+        VARIABLE_SALIDA
     ].get(
         conjunto,
         0.0

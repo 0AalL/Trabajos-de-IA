@@ -2,6 +2,7 @@ import random
 
 from configuracion import (
     VARIABLES_ENTRADA,
+    VARIABLE_SALIDA,
     CONJUNTOS,
     NO_USAR,
     PROB_MUTACION
@@ -46,7 +47,7 @@ def mutar_individuo(
     if random.random() < PROB_MUTACION:
 
         individuo[indice_salida] = random.choice(
-            CONJUNTOS["incendio"]
+            CONJUNTOS[VARIABLE_SALIDA]
         )
 
     # --------------------------------------------------------

@@ -4,6 +4,7 @@ from deap import base, creator
 
 from configuracion import (
     VARIABLES_ENTRADA,
+    VARIABLE_SALIDA,
     CONJUNTOS,
     NO_USAR
 )
@@ -47,7 +48,26 @@ def crear_individuo():
 
         genes = []
 
-        # 7 antecedentes
+        # ====================================================
+        # ANTECEDENTES
+        #
+        # Se crea un gen por cada variable de entrada.
+        #
+        # Actualmente:
+        #
+        # 1. T_mean
+        # 2. RH_mean
+        # 3. Wind_mean
+        # 4. PPT_tot
+        # 5. FFMC
+        # 6. DMC
+        # 7. DC
+        # 8. KBDI
+        #
+        # Cada gen puede tomar uno de los conjuntos fuzzy
+        # de su variable o NO_USAR.
+        # ====================================================
+
         for variable in VARIABLES_ENTRADA:
 
             opciones = (
@@ -59,14 +79,34 @@ def crear_individuo():
                 random.choice(opciones)
             )
 
-        # Consecuente
+
+        # ====================================================
+        # CONSECUENTE
+        #
+        # La salida es:
+        #
+        # Area Burned (Ha)
+        #
+        # Se utiliza VARIABLE_SALIDA para evitar nombres
+        # escritos directamente como "incendio".
+        # ====================================================
+
         genes.append(
             random.choice(
-                CONJUNTOS["incendio"]
+                CONJUNTOS[VARIABLE_SALIDA]
             )
         )
 
-        # No permitir regla vacía
+
+        # ====================================================
+        # NO PERMITIR REGLA VACÍA
+        #
+        # Al menos uno de los antecedentes debe utilizarse.
+        #
+        # El último gen corresponde al consecuente, por eso
+        # solamente se revisan genes[:-1].
+        # ====================================================
+
         if any(
             gen != NO_USAR
             for gen in genes[:-1]
