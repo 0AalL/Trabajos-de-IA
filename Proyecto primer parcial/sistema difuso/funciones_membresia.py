@@ -47,23 +47,16 @@ def crear_funciones_membresia():
 
         for conjunto, parametros in conjuntos.items():
 
-            if variable == "incendio":
+            # Todas las funciones actuales tienen
+            # cuatro parámetros [a, b, c, d],
+            # por lo tanto se utiliza trapmf.
 
-                funciones[variable][conjunto] = (
-                    crear_triangular(
-                        universo,
-                        parametros
-                    )
+            funciones[variable][conjunto] = (
+                crear_trapezoidal(
+                    universo,
+                    parametros
                 )
-
-            else:
-
-                funciones[variable][conjunto] = (
-                    crear_trapezoidal(
-                        universo,
-                        parametros
-                    )
-                )
+            )
 
     return funciones
 
