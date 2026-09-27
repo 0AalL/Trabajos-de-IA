@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np # type: ignore
 
 from configuracion import (
     VARIABLES_ENTRADA,
@@ -9,183 +10,64 @@ from configuracion import (
     ARCHIVO_DATASET_FUZZIFICADO
 )
 
-
 # ============================================================
-# TRAPEZOIDAL
+# TRAPEZOIDAL VECTORIZADO
 # ============================================================
 
-def pertenencia_trapezoidal(x, parametros):
-
+def pertenencia_trapezoidal_vec(x, parametros):
     a, b, c, d = parametros
-
-    if x < a or x > d:
-        return 0.0
-
-    if a == b and x == a:
-        return 1.0
-
-    if a < x < b:
-        return (x - a) / (b - a)
-
-    if b <= x <= c:
-        return 1.0
-
-    if c == d and x == d:
-        return 1.0
-
-    if c < x < d:
-        return (d - x) / (d - c)
-
-    return 0.0
-
-
-# ============================================================
-# TRIANGULAR
-# ============================================================
-
-def pertenencia_triangular(x, parametros):
-
-    a, b, c = parametros
-
-    if x < a or x > c:
-        return 0.0
-
-    if x == b:
-        return 1.0
-
-    if a == b and x == a:
-        return 1.0
-
-    if b == c and x == c:
-        return 1.0
-
-    if a < x < b:
-        return (x - a) / (b - a)
-
-    if b < x < c:
-        return (c - x) / (c - b)
-
-    return 0.0
+    y = np.zeros_like(x, dtype=float)
+    
+    # b <= x <= c
+    if b <= c:
+        y[(x >= b) & (x <= c)] = 1.0
+        
+    # a < x < b
+    if b > a:
+        mask = (x > a) & (x < b)
+        y[mask] = (x[mask] - a) / (b - a)
+    elif a == b:
+        y[x == a] = 1.0
+        
+    # c < x < d
+    if d > c:
+        mask = (x > c) & (x < d)
+        y[mask] = (d - x[mask]) / (d - c)
+    elif c == d:
+        y[x == d] = 1.0
+        
+    return y
 
 
 # ============================================================
-# FUZZIFICACIÓN GENERAL
-# ============================================================
-
-def fuzzificar_variable(variable, valor):
-
-    resultado = {}
-
-    for conjunto in CONJUNTOS[variable]:
-
-        parametros = PARAMETROS_MEMBRESIA[
-            variable
-        ][conjunto]
-
-        if variable == "incendio":
-
-            grado = pertenencia_triangular(
-                valor,
-                parametros
-            )
-
-        else:
-
-            grado = pertenencia_trapezoidal(
-                valor,
-                parametros
-            )
-
-        resultado[conjunto] = grado
-
-    return resultado
-
-
-# ============================================================
-# CONJUNTO DOMINANTE
-# ============================================================
-
-def conjunto_dominante(grados):
-
-    return max(
-        grados,
-        key=grados.get
-    )
-
-
-# ============================================================
-# FUZZIFICAR FILA
-# ============================================================
-
-def fuzzificar_fila(fila):
-
-    grados = {}
-
-    categorias = {}
-
-    variables = (
-        VARIABLES_ENTRADA
-        + [VARIABLE_SALIDA]
-    )
-
-    for variable in variables:
-
-        valor = float(
-            fila[variable]
-        )
-
-        grados_variable = fuzzificar_variable(
-            variable,
-            valor
-        )
-
-        grados[variable] = grados_variable
-
-        categorias[variable] = conjunto_dominante(
-            grados_variable
-        )
-
-    return grados, categorias
-
-
-# ============================================================
-# FUZZIFICAR DATASET
+# FUZZIFICAR DATASET VECTORIZADO
 # ============================================================
 
 def fuzzificar_dataset():
-
-    df = pd.read_csv(
-        ARCHIVO_DATASET
-    )
-
-    datos_fuzzificados = []
-
-    evidencia = []
-
-    for _, fila in df.iterrows():
-
-        grados, categorias = fuzzificar_fila(
-            fila
-        )
-
-        datos_fuzzificados.append(
-            grados
-        )
-
-        evidencia.append(
-            categorias
-        )
-
-    df_evidencia = pd.DataFrame(
-        evidencia
-    )
-
-    df_evidencia.to_csv(
-        ARCHIVO_DATASET_FUZZIFICADO,
-        index=False
-    )
-
-    return (
-        df,
-        datos_fuzzificados
-    )
+    df = pd.read_csv(ARCHIVO_DATASET)
+    
+    datos_fuzzificados = {}
+    evidencia = {}
+    
+    variables = VARIABLES_ENTRADA + [VARIABLE_SALIDA]
+    
+    for variable in variables:
+        datos_fuzzificados[variable] = {}
+        valores = df[variable].values.astype(float)
+        
+        # Calcular pertenencia para cada conjunto difuso
+        for conjunto in CONJUNTOS[variable]:
+            parametros = PARAMETROS_MEMBRESIA[variable][conjunto]
+            grados = pertenencia_trapezoidal_vec(valores, parametros)
+            datos_fuzzificados[variable][conjunto] = grados
+            
+        # Determinar el conjunto dominante para la evidencia
+        grados_matriz = np.array([datos_fuzzificados[variable][c] for c in CONJUNTOS[variable]])
+        indices_max = np.argmax(grados_matriz, axis=0)
+        conjuntos = np.array(CONJUNTOS[variable])
+        evidencia[variable] = conjuntos[indices_max]
+        
+    df_evidencia = pd.DataFrame(evidencia)
+    df_evidencia.to_csv(ARCHIVO_DATASET_FUZZIFICADO, index=False)
+    
+    return df, datos_fuzzificados

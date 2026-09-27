@@ -1,3 +1,4 @@
+import numpy as np # type: ignore
 from configuracion import (
     VARIABLES_ENTRADA,
     VARIABLE_SALIDA
@@ -5,94 +6,29 @@ from configuracion import (
 
 
 # ============================================================
-# GRADO DEL ANTECEDENTE
+# CALCULAR MÉTRICAS VECTORIZADAS
 # ============================================================
 
-def grado_antecedente(
-    regla,
-    fila_grados
-):
+def calcular_metricas(regla, datos_fuzzificados):
+    # La matriz de salida de una variable cualquiera nos da el total de registros (N)
+    consecuente_cualquiera = next(iter(datos_fuzzificados[VARIABLE_SALIDA].values()))
+    n = len(consecuente_cualquiera)
 
-    grados = []
-
-    for i, variable in enumerate(
-        VARIABLES_ENTRADA
-    ):
-
+    # --------------------------------------------------------
+    # 1. Grado del antecedente
+    # --------------------------------------------------------
+    grados_a = []
+    num_antecedentes = 0
+    
+    for i, variable in enumerate(VARIABLES_ENTRADA):
         conjunto = regla[i]
-
-        # NO_USAR = no participa
         if conjunto == "NO_USAR":
-
             continue
-
-        grado = fila_grados[
-            variable
-        ].get(
-            conjunto,
-            0.0
-        )
-
-        grados.append(
-            grado
-        )
-
-    if not grados:
-
-        return 0.0
-
-    # AND fuzzy = mínimo
-    return min(
-        grados
-    )
-
-
-# ============================================================
-# GRADO DEL CONSECUENTE
-# ============================================================
-
-def grado_consecuente(
-    regla,
-    fila_grados
-):
-
-    indice = len(
-        VARIABLES_ENTRADA
-    )
-
-    conjunto = regla[
-        indice
-    ]
-
-    return fila_grados[
-        VARIABLE_SALIDA
-    ].get(
-        conjunto,
-        0.0
-    )
-
-
-# ============================================================
-# CALCULAR MÉTRICAS
-# ============================================================
-
-def calcular_metricas(
-    regla,
-    datos_fuzzificados
-):
-
-    suma_ab = 0.0
-
-    suma_a = 0.0
-
-    suma_b = 0.0
-
-    n = len(
-        datos_fuzzificados
-    )
-
-    if n == 0:
-
+            
+        num_antecedentes += 1
+        grados_a.append(datos_fuzzificados[variable][conjunto])
+        
+    if num_antecedentes == 0:
         return {
             "support": 0.0,
             "confidence": 0.0,
@@ -100,98 +36,67 @@ def calcular_metricas(
             "lift": 0.0,
             "fitness": 0.0
         }
-
-    for fila_grados in datos_fuzzificados:
-
-        grado_a = grado_antecedente(
-            regla,
-            fila_grados
-        )
-
-        grado_b = grado_consecuente(
-            regla,
-            fila_grados
-        )
-
-        grado_ab = min(
-            grado_a,
-            grado_b
-        )
-
-        suma_ab += grado_ab
-
-        suma_a += grado_a
-
-        suma_b += grado_b
+        
+    # AND difuso = mínimo vectorizado
+    grado_a = np.minimum.reduce(grados_a)
 
     # --------------------------------------------------------
-    # Support
+    # 2. Grado del consecuente
     # --------------------------------------------------------
-
-    support = (
-        suma_ab / n
-    )
-
-    # --------------------------------------------------------
-    # Coverage
-    # --------------------------------------------------------
-
-    coverage = (
-        suma_a / n
-    )
+    indice_salida = len(VARIABLES_ENTRADA)
+    consecuente = regla[indice_salida]
+    grado_b = datos_fuzzificados[VARIABLE_SALIDA][consecuente]
 
     # --------------------------------------------------------
-    # Support del consecuente
+    # 3. Intersección (A AND B)
     # --------------------------------------------------------
-
-    support_b = (
-        suma_b / n
-    )
+    grado_ab = np.minimum(grado_a, grado_b)
 
     # --------------------------------------------------------
-    # Confidence
+    # 4. Calcular sumas
     # --------------------------------------------------------
+    suma_ab = float(np.sum(grado_ab))
+    suma_a = float(np.sum(grado_a))
+    suma_b = float(np.sum(grado_b))
 
-    if coverage > 0:
+    # --------------------------------------------------------
+    # 5. Métricas clásicas
+    # --------------------------------------------------------
+    support = suma_ab / n
+    coverage = suma_a / n
+    support_b = suma_b / n
+    
+    confidence = (support / coverage) if coverage > 0 else 0.0
+    lift = (confidence / support_b) if support_b > 0 else 0.0
 
-        confidence = (
-            support / coverage
-        )
-
+    # --------------------------------------------------------
+    # 6. FITNESS (Multiobjetivo y Parsimonia)
+    # --------------------------------------------------------
+    # Exigimos un umbral mínimo de cobertura estadística (0.5% del dataset = 100 filas)
+    if coverage < 0.005:
+        # Penalización masiva, pero le damos un micropuntaje por parsimonia 
+        # para que evolucione alejándose de reglas muy largas
+        penalizacion_long = 1.0 - (num_antecedentes / (len(VARIABLES_ENTRADA) + 1.0))
+        fitness = 0.0001 * penalizacion_long
     else:
-
-        confidence = 0.0
-
-    # --------------------------------------------------------
-    # Lift
-    # --------------------------------------------------------
-
-    if support_b > 0:
-
-        lift = (
-            confidence / support_b
-        )
-
-    else:
-
-        lift = 0.0
-
-    # --------------------------------------------------------
-    # FITNESS
-    # --------------------------------------------------------
-
-    fitness = lift
+        # Parsimonia: reglas más cortas tienen un bonus
+        penalizacion_long = 1.0 - (num_antecedentes / (len(VARIABLES_ENTRADA) + 1.0))
+        
+        # Cobertura relativa a la clase (cuánto de la clase objetivo logra capturar)
+        cobertura_clase = support / support_b if support_b > 0 else 0.0
+        
+        # Fitness balanceado: premiamos fuertemente la confianza (0.8), 
+        # pero la atamos a que tenga soporte dentro de su clase (0.2).
+        fitness = (0.8 * confidence + 0.2 * cobertura_clase) * penalizacion_long
+        
+        # Opcionalmente se puede meter un multiplicador de Lift normalizado si se desea,
+        # pero esto evita la trampa de las reglas de 1 caso.
 
     return {
-
         "support": support,
-
         "confidence": confidence,
-
         "coverage": coverage,
-
         "lift": lift,
-
         "fitness": fitness
     }
 
@@ -200,16 +105,6 @@ def calcular_metricas(
 # EVALUAR INDIVIDUO
 # ============================================================
 
-def evaluar_individuo(
-    individuo,
-    datos_fuzzificados
-):
-
-    metricas = calcular_metricas(
-        individuo,
-        datos_fuzzificados
-    )
-
-    return (
-        metricas["fitness"],
-    )
+def evaluar_individuo(individuo, datos_fuzzificados):
+    metricas = calcular_metricas(individuo, datos_fuzzificados)
+    return (metricas["fitness"],)

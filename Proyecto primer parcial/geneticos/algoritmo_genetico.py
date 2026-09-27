@@ -7,7 +7,8 @@ from configuracion import (
     NUM_GENERACIONES,
     SEMILLA,
     ARCHIVO_REGLAS_ULTIMA_GENERACION,
-    VARIABLES_ENTRADA
+    VARIABLES_ENTRADA,
+    VARIABLE_SALIDA
 )
 
 from poblacion_inicial import crear_poblacion_inicial
@@ -308,7 +309,7 @@ def convertir_regla_texto(regla):
     # -----------------------------------------------------
     #
     # La última posición del individuo corresponde
-    # a la variable de salida incendio.
+    # a la variable de salida.
     # -----------------------------------------------------
 
     indice_salida = len(
@@ -325,5 +326,5 @@ def convertir_regla_texto(regla):
 
     return (
         f"IF {antecedente} "
-        f"THEN incendio={consecuente}"
+        f"THEN {VARIABLE_SALIDA}={consecuente}"
     )
