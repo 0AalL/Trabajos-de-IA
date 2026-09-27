@@ -489,4 +489,4 @@ PARAMETROS_MEMBRESIA = {
 # ARCHIVO DE REGLAS
 # =========================================================
 
-ARCHIVO_REGLAS = "../resultados/reglas_finales.csv"
+ARCHIVO_REGLAS = "../reglas finales/reglas_finales.csv"
