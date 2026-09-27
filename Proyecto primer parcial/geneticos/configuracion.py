@@ -231,21 +231,21 @@ SEMILLA = 42
 # ARCHIVOS
 # ============================================================
 
-ARCHIVO_DATASET = "dataset_numerico.csv"
+ARCHIVO_DATASET = "../dataset_numerico.csv"
 
 CARPETA_RESULTADOS = "resultados"
 
 ARCHIVO_DATASET_FUZZIFICADO = os.path.join(
     CARPETA_RESULTADOS,
-    "dataset_fuzzificado.csv"
+    "../resultados/dataset_fuzzificado.csv"
 )
 
 ARCHIVO_REGLAS_ULTIMA_GENERACION = os.path.join(
     CARPETA_RESULTADOS,
-    "reglas_ultima_generacion.csv"
+    "../resultados/reglas_ultima_generacion.csv"
 )
 
 ARCHIVO_REGLAS_FINALES = os.path.join(
     CARPETA_RESULTADOS,
-    "reglas_finales.csv"
+    "../resultados/reglas_finales.csv"
 )
