@@ -130,10 +130,10 @@ class Aplicacion:
         # -------------------------------------------------
 
         nombres = {
-            "T_mean": "Temperatura (°C)",
-            "RH_mean": "Humedad (%)",
-            "Wind_mean": "Viento (m/s)",
-            "PPT_tot": "Precipitación (mm)",
+            "T_media": "Temperatura (°C)",
+            "HR_media": "Humedad (%)",
+            "Viento_medio": "Viento (m/s)",
+            "Precipitacion": "Precipitación (mm)",
             "FFMC": "FFMC (Combustible Fino)",
             "DMC": "DMC (Capa Orgánica)",
             "DC": "DC (Sequía)",
