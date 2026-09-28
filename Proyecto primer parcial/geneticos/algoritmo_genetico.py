@@ -1,4 +1,3 @@
-
 import random
 import pandas as pd
 
@@ -30,14 +29,13 @@ random.seed(SEMILLA)
 # EVALUAR POBLACIÓN
 # =========================================================
 
-def evaluar_poblacion(poblacion, datos_fuzzificados):
-    """
-    Calcula el fitness de todos los individuos de una población.
-
-    El fitness está definido únicamente como el Lift de la regla.
-    """
+def evaluar_poblacion(
+    poblacion,
+    datos_fuzzificados
+):
 
     for individuo in poblacion:
+
         individuo.fitness.values = evaluar_individuo(
             individuo,
             datos_fuzzificados
@@ -45,10 +43,95 @@ def evaluar_poblacion(poblacion, datos_fuzzificados):
 
 
 # =========================================================
+# CONVERTIR POBLACIÓN A REGLAS
+# =========================================================
+
+def convertir_poblacion_a_reglas(
+    poblacion,
+    datos_fuzzificados
+):
+
+    reglas = []
+
+    for individuo in poblacion:
+
+        metricas = calcular_metricas(
+            individuo,
+            datos_fuzzificados
+        )
+
+        regla = {
+
+            "individuo":
+                list(individuo),
+
+            "support":
+                metricas["support"],
+
+            "confidence":
+                metricas["confidence"],
+
+            "coverage":
+                metricas["coverage"],
+
+            "lift":
+                metricas["lift"],
+
+            "fitness":
+                metricas["fitness"]
+        }
+
+        reglas.append(
+            regla
+        )
+
+    return reglas
+
+
+# =========================================================
+# ELIMINAR REGLAS DUPLICADAS
+# =========================================================
+
+def eliminar_reglas_duplicadas(
+    reglas
+):
+
+    unicas = {}
+
+    for regla in reglas:
+
+        clave = tuple(
+            regla["individuo"]
+        )
+
+        # Si no existe, se guarda.
+        if clave not in unicas:
+
+            unicas[clave] = regla
+
+        else:
+
+            # Si ya existe, conservar la de mayor fitness.
+            if (
+                regla["fitness"]
+                >
+                unicas[clave]["fitness"]
+            ):
+
+                unicas[clave] = regla
+
+    return list(
+        unicas.values()
+    )
+
+
+# =========================================================
 # EJECUTAR ALGORITMO GENÉTICO
 # =========================================================
 
-def ejecutar_algoritmo_genetico(datos_fuzzificados):
+def ejecutar_algoritmo_genetico(
+    datos_fuzzificados
+):
 
     # -----------------------------------------------------
     # 1. CREAR POBLACIÓN INICIAL
@@ -56,24 +139,66 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
 
     poblacion = crear_poblacion_inicial()
 
-    # Evaluar población inicial
     evaluar_poblacion(
         poblacion,
         datos_fuzzificados
     )
 
-    # Historial para guardar la evolución
+    # -----------------------------------------------------
+    # NÚMERO DE HIJOS
+    # -----------------------------------------------------
+    #
+    # La mitad de la población.
+    #
+    # Si TAM_POBLACION = 100:
+    #
+    #     numero_hijos = 50
+    #
+    # -----------------------------------------------------
+
+    numero_hijos = TAM_POBLACION // 2
+
+    # -----------------------------------------------------
+    # GUARDAR LAS REGLAS DE CADA GENERACIÓN
+    # -----------------------------------------------------
+    #
+    # Se guarda cada generación por separado.
+    #
+    # Esto permite que cobertura.py utilice primero
+    # la última generación y después generaciones
+    # anteriores si hace falta.
+    #
+    # -----------------------------------------------------
+
+    historial_reglas = []
+
+    # Población inicial
+    reglas_iniciales = convertir_poblacion_a_reglas(
+        poblacion,
+        datos_fuzzificados
+    )
+
+    historial_reglas.append(
+        reglas_iniciales
+    )
+
+    # -----------------------------------------------------
+    # HISTORIAL
+    # -----------------------------------------------------
+
     historial = {
         "generaciones": [],
         "fitness": [],
         "fitness_promedio": []
     }
 
-    # -----------------------------------------------------
+    # =====================================================
     # 2. EVOLUCIÓN
-    # -----------------------------------------------------
+    # =====================================================
 
-    for generacion in range(NUM_GENERACIONES):
+    for generacion in range(
+        NUM_GENERACIONES
+    ):
 
         # -------------------------------------------------
         # SELECCIÓN
@@ -92,6 +217,14 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
         )
 
         # -------------------------------------------------
+        # LIMITAR HIJOS
+        # -------------------------------------------------
+
+        hijos = hijos[
+            :numero_hijos
+        ]
+
+        # -------------------------------------------------
         # MUTACIÓN
         # -------------------------------------------------
 
@@ -100,7 +233,7 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
         )
 
         # -------------------------------------------------
-        # EVALUACIÓN DE LOS HIJOS
+        # EVALUAR HIJOS
         # -------------------------------------------------
 
         evaluar_poblacion(
@@ -111,15 +244,6 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
         # -------------------------------------------------
         # ELIMINACIÓN
         # -------------------------------------------------
-        #
-        # Se juntan:
-        #
-        #   población actual + hijos
-        #
-        # y se conservan los mejores individuos.
-        #
-        # Esto corresponde a una estrategia (μ + λ).
-        # -------------------------------------------------
 
         poblacion = eliminar_peores(
             poblacion,
@@ -127,11 +251,32 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
         )
 
         # -------------------------------------------------
-        # CALCULAR ESTADÍSTICAS
+        # CONVERTIR LA NUEVA POBLACIÓN A REGLAS
+        # -------------------------------------------------
+
+        reglas_generacion = (
+            convertir_poblacion_a_reglas(
+                poblacion,
+                datos_fuzzificados
+            )
+        )
+
+        # -------------------------------------------------
+        # GUARDAR GENERACIÓN
+        # -------------------------------------------------
+
+        historial_reglas.append(
+            reglas_generacion
+        )
+
+        # -------------------------------------------------
+        # ESTADÍSTICAS
         # -------------------------------------------------
 
         fitnesses = [
+
             individuo.fitness.values[0]
+
             for individuo in poblacion
         ]
 
@@ -140,12 +285,10 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
         )
 
         promedio_fitness = (
-            sum(fitnesses) / len(fitnesses)
+            sum(fitnesses)
+            /
+            len(fitnesses)
         )
-
-        # -------------------------------------------------
-        # GUARDAR HISTORIAL
-        # -------------------------------------------------
 
         historial["generaciones"].append(
             generacion + 1
@@ -165,87 +308,154 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
 
         print(
             f"Generación "
-            f"{generacion + 1:03d}/{NUM_GENERACIONES} "
-            f"| Mejor Fitness = {mejor_fitness:.6f} "
-            f"| Fitness Promedio = {promedio_fitness:.6f}"
+            f"{generacion + 1:03d}/"
+            f"{NUM_GENERACIONES} "
+            f"| Mejor Fitness = "
+            f"{mejor_fitness:.6f} "
+            f"| Fitness Promedio = "
+            f"{promedio_fitness:.6f}"
         )
 
     # =====================================================
-    # 3. OBTENER REGLAS DE LA ÚLTIMA GENERACIÓN
+    # 3. REGLAS DE LA ÚLTIMA GENERACIÓN
     # =====================================================
 
-    reglas = []
+    reglas_ultima_generacion = (
+        historial_reglas[-1]
+    )
 
-    for individuo in poblacion:
-
-        # Calcular nuevamente todas las métricas
-        metricas = calcular_metricas(
-            individuo,
-            datos_fuzzificados
+    reglas_ultima_generacion = (
+        eliminar_reglas_duplicadas(
+            reglas_ultima_generacion
         )
+    )
 
-        regla = {
-            "individuo": list(individuo),
-
-            "support": metricas["support"],
-
-            "confidence": metricas["confidence"],
-
-            "coverage": metricas["coverage"],
-
-            "lift": metricas["lift"],
-
-            "fitness": metricas["fitness"]
-        }
-
-        reglas.append(
-            regla
-        )
-
-    # =====================================================
-    # 4. ORDENAR REGLAS POR FITNESS
-    # =====================================================
-    #
-    # Como:
-    #
-    #     Fitness = Lift
-    #
-    # ordenar por fitness equivale a ordenar por Lift.
-    # =====================================================
-
-    reglas.sort(
-        key=lambda regla: regla["fitness"],
+    reglas_ultima_generacion.sort(
+        key=lambda regla:
+            regla["fitness"],
         reverse=True
     )
 
     # =====================================================
-    # 5. GUARDAR REGLAS DE LA ÚLTIMA GENERACIÓN
+    # 4. CREAR BANCO DE REGLAS
+    # =====================================================
+    #
+    # IMPORTANTE:
+    #
+    # Primero se agregan las reglas de la última
+    # generación.
+    #
+    # Después se agregan las generaciones anteriores,
+    # comenzando por la más reciente.
+    #
+    # De esta forma cobertura.py intenta cubrir todo
+    # primero con la última generación.
+    #
+    # =====================================================
+
+    banco_reglas = []
+
+    for reglas_generacion in reversed(
+        historial_reglas
+    ):
+
+        banco_reglas.extend(
+            reglas_generacion
+        )
+
+    # -----------------------------------------------------
+    # Eliminar duplicados conservando el primero.
+    #
+    # Como se recorrieron las generaciones desde la
+    # última hacia atrás, se conserva primero la versión
+    # perteneciente a la generación más reciente.
+    # -----------------------------------------------------
+
+    banco_reglas = (
+        eliminar_reglas_duplicadas(
+            banco_reglas
+        )
+    )
+
+    # -----------------------------------------------------
+    # Ordenar:
+    #
+    # 1. Prioridad por generación ya está representada
+    #    por el orden original.
+    #
+    # 2. Dentro de ese banco, se prioriza fitness.
+    #
+    # Para garantizar que las reglas de la última
+    # generación tengan prioridad, se construye el banco
+    # nuevamente por bloques.
+    # -----------------------------------------------------
+
+    reglas_ordenadas = []
+
+    utilizadas = set()
+
+    for reglas_generacion in reversed(
+        historial_reglas
+    ):
+
+        reglas_generacion = sorted(
+            reglas_generacion,
+            key=lambda regla:
+                regla["fitness"],
+            reverse=True
+        )
+
+        for regla in reglas_generacion:
+
+            clave = tuple(
+                regla["individuo"]
+            )
+
+            if clave not in utilizadas:
+
+                utilizadas.add(
+                    clave
+                )
+
+                reglas_ordenadas.append(
+                    regla
+                )
+
+    # =====================================================
+    # 5. GUARDAR ÚLTIMA GENERACIÓN
     # =====================================================
 
     filas = []
 
     for numero, regla in enumerate(
-        reglas,
+        reglas_ultima_generacion,
         start=1
     ):
 
         filas.append(
             {
-                "numero": numero,
+                "numero":
+                    numero,
 
-                "regla": convertir_regla_texto(
-                    regla["individuo"]
-                ),
+                "regla":
+                    convertir_regla_texto(
+                        regla["individuo"]
+                    ),
 
-                "support": regla["support"],
+                "support":
+                    regla["support"],
 
-                "confidence": regla["confidence"],
+                "confidence":
+                    regla["confidence"],
 
-                "coverage": regla["coverage"],
+                "coverage":
+                    regla["coverage"],
 
-                "lift": regla["lift"],
+                "lift":
+                    regla["lift"],
 
-                "fitness": regla["fitness"]
+                "fitness":
+                    regla["fitness"]
             }
         )
 
@@ -259,22 +469,35 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
     )
 
     # =====================================================
-    # 6. RETORNAR RESULTADOS
+    # 6. RETORNAR
+    # =====================================================
+    #
+    # reglas_ordenadas:
+    #     Todas las reglas disponibles para cobertura.
+    #
+    # historial:
+    #     Estadísticas del algoritmo.
+    #
     # =====================================================
 
-    return reglas, historial
+    return (
+        reglas_ordenadas,
+        historial
+    )
 
 
 # =========================================================
 # CONVERTIR REGLA A TEXTO
 # =========================================================
 
-def convertir_regla_texto(regla):
+def convertir_regla_texto(
+    regla
+):
 
     condiciones = []
 
     # -----------------------------------------------------
-    # RECORRER LAS VARIABLES DE ENTRADA
+    # VARIABLES DE ENTRADA
     # -----------------------------------------------------
 
     for i, variable in enumerate(
@@ -283,7 +506,6 @@ def convertir_regla_texto(regla):
 
         conjunto = regla[i]
 
-        # Si no es NO_USAR, se agrega la condición
         if conjunto != "NO_USAR":
 
             condiciones.append(
@@ -291,7 +513,7 @@ def convertir_regla_texto(regla):
             )
 
     # -----------------------------------------------------
-    # CONSTRUIR ANTECEDENTE
+    # ANTECEDENTE
     # -----------------------------------------------------
 
     if condiciones:
@@ -305,11 +527,7 @@ def convertir_regla_texto(regla):
         antecedente = "TRUE"
 
     # -----------------------------------------------------
-    # OBTENER CONSECUENTE
-    # -----------------------------------------------------
-    #
-    # La última posición del individuo corresponde
-    # a la variable de salida.
+    # CONSECUENTE
     # -----------------------------------------------------
 
     indice_salida = len(
@@ -321,10 +539,11 @@ def convertir_regla_texto(regla):
     ]
 
     # -----------------------------------------------------
-    # CONSTRUIR REGLA COMPLETA
+    # REGLA COMPLETA
     # -----------------------------------------------------
 
     return (
         f"IF {antecedente} "
-        f"THEN {VARIABLE_SALIDA}={consecuente}"
+        f"THEN {VARIABLE_SALIDA}="
+        f"{consecuente}"
     )

@@ -145,6 +145,10 @@ def main():
         )
     )
 
+    # ========================================================
+    # RESULTADOS DE COBERTURA
+    # ========================================================
+
     print()
     print(
         f"Combinaciones posibles: "
@@ -159,6 +163,29 @@ def main():
     print(
         f"Combinaciones faltantes: "
         f"{len(faltantes)}"
+    )
+
+    # --------------------------------------------------------
+    # PORCENTAJE DE COBERTURA
+    # --------------------------------------------------------
+
+    if combinaciones:
+
+        porcentaje = (
+            len(cubiertas)
+            /
+            len(combinaciones)
+            *
+            100
+        )
+
+    else:
+
+        porcentaje = 0.0
+
+    print(
+        f"Porcentaje de cobertura: "
+        f"{porcentaje:.2f}%"
     )
 
     # ========================================================
@@ -179,7 +206,7 @@ def main():
     print("=" * 70)
 
     print(
-        f"Individuos última generación: "
+        f"Reglas disponibles para cobertura: "
         f"{len(reglas)}"
     )
 
@@ -187,6 +214,31 @@ def main():
         f"Reglas finales seleccionadas: "
         f"{len(reglas_finales)}"
     )
+
+    # ========================================================
+    # ESTADO DE COBERTURA
+    # ========================================================
+
+    print()
+
+    if not faltantes:
+
+        print(
+            "COBERTURA COMPLETA: "
+            "todas las combinaciones están cubiertas."
+        )
+
+    else:
+
+        print(
+            "ADVERTENCIA: todavía existen "
+            f"{len(faltantes)} "
+            "combinaciones sin cubrir."
+        )
+
+    # ========================================================
+    # ARCHIVOS
+    # ========================================================
 
     print()
     print(
