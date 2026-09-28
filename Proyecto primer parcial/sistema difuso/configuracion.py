@@ -132,4 +132,7 @@ UNIVERSOS = {
 # ARCHIVO DE REGLAS
 # ============================================================
 
-ARCHIVO_REGLAS = "../reglas finales/reglas_finales.csv"
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ARCHIVO_REGLAS = os.path.normpath(os.path.join(BASE_DIR, "..", "reglas finales", "reglas_finales.csv"))
+

@@ -28,7 +28,8 @@ def calcular_metricas(regla, datos_fuzzificados):
         num_antecedentes += 1
         grados_a.append(datos_fuzzificados[variable][conjunto])
         
-    if num_antecedentes == 0:
+    # Exigir al menos 2 antecedentes para evitar reglas triviales de 1 sola variable
+    if num_antecedentes < 2:
         return {
             "support": 0.0,
             "confidence": 0.0,
@@ -70,27 +71,21 @@ def calcular_metricas(regla, datos_fuzzificados):
     lift = (confidence / support_b) if support_b > 0 else 0.0
 
     # --------------------------------------------------------
-    # 6. FITNESS (Multiobjetivo y Parsimonia)
+    # 6. FITNESS (Multiobjetivo y Parsimonia Contextual)
     # --------------------------------------------------------
     # Exigimos un umbral mínimo de cobertura estadística (0.5% del dataset = 100 filas)
-    if coverage < 0.005:
-        # Penalización masiva, pero le damos un micropuntaje por parsimonia 
-        # para que evolucione alejándose de reglas muy largas
-        penalizacion_long = 1.0 - (num_antecedentes / (len(VARIABLES_ENTRADA) + 1.0))
-        fitness = 0.0001 * penalizacion_long
+    # y que la regla tenga correlación positiva (Lift > 1.05)
+    if coverage < 0.005 or lift < 1.05:
+        fitness = 0.0001
     else:
-        # Parsimonia: reglas más cortas tienen un bonus
-        penalizacion_long = 1.0 - (num_antecedentes / (len(VARIABLES_ENTRADA) + 1.0))
+        # Parsimonia amigable con 2 y 3 antecedentes (longitud óptima de reglas difusas)
+        penalizacion_long = 1.0 if num_antecedentes <= 3 else (1.0 - (num_antecedentes - 3) * 0.1)
         
         # Cobertura relativa a la clase (cuánto de la clase objetivo logra capturar)
         cobertura_clase = support / support_b if support_b > 0 else 0.0
         
-        # Fitness balanceado: premiamos fuertemente la confianza (0.8), 
-        # pero la atamos a que tenga soporte dentro de su clase (0.2).
-        fitness = (0.8 * confidence + 0.2 * cobertura_clase) * penalizacion_long
-        
-        # Opcionalmente se puede meter un multiplicador de Lift normalizado si se desea,
-        # pero esto evita la trampa de las reglas de 1 caso.
+        # Fitness balanceado: confianza alta (0.7) y representatividad de clase (0.3)
+        fitness = (0.7 * confidence + 0.3 * cobertura_clase) * penalizacion_long
 
     return {
         "support": support,

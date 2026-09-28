@@ -85,7 +85,8 @@ def combinaciones_cubiertas_por_regla(
 # ============================================================
 
 def seleccionar_reglas_por_cobertura(
-    reglas
+    reglas,
+    min_reglas_por_clase=5
 ):
 
     combinaciones = (
@@ -103,25 +104,22 @@ def seleccionar_reglas_por_cobertura(
     reglas_finales = []
 
     # --------------------------------------------------------
-    # 1. GARANTIZAR COMPLETITUD:
-    # Asegurar al menos la mejor regla de cada clase de salida
+    # 1. GARANTIZAR PLURALIDAD Y COMPLETITUD:
+    # Asegurar hasta min_reglas_por_clase reglas únicas por
+    # cada clase de riesgo para tener una base robusta
     # --------------------------------------------------------
 
-    clases_vistas = set()
+    conteo_por_clase = {}
 
     for regla in reglas:
 
         consecuente = regla["individuo"][-1]
+        conteo = conteo_por_clase.get(consecuente, 0)
 
-        if consecuente not in clases_vistas:
+        if conteo < min_reglas_por_clase:
 
-            clases_vistas.add(
-                consecuente
-            )
-
-            reglas_finales.append(
-                regla
-            )
+            conteo_por_clase[consecuente] = conteo + 1
+            reglas_finales.append(regla)
 
             nuevas = (
                 combinaciones_cubiertas_por_regla(

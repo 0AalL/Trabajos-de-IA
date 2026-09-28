@@ -106,18 +106,13 @@ def crear_individuo(
 
 
         # ====================================================
-        # NO PERMITIR REGLA VACÍA
+        # NO PERMITIR REGLA TRIVIAL O VACÍA
         #
-        # Al menos uno de los antecedentes debe utilizarse.
-        #
-        # El último gen corresponde al consecuente, por eso
-        # solamente se revisan genes[:-1].
+        # Al menos dos de los antecedentes deben utilizarse
+        # para que la regla sea contextual y no degenerada.
         # ====================================================
 
-        if any(
-            gen != NO_USAR
-            for gen in genes[:-1]
-        ):
+        if sum(1 for gen in genes[:-1] if gen != NO_USAR) >= 2:
 
             return creator.Regla(
                 genes

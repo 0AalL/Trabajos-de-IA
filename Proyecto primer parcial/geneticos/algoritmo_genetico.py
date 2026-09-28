@@ -9,7 +9,8 @@ from configuracion import (
     ARCHIVO_REGLAS_ULTIMA_GENERACION,
     VARIABLES_ENTRADA,
     VARIABLE_SALIDA,
-    CONJUNTOS
+    CONJUNTOS,
+    NO_USAR
 )
 
 from poblacion_inicial import crear_poblacion_inicial
@@ -44,137 +45,131 @@ def evaluar_poblacion(poblacion, datos_fuzzificados):
 
 
 # =========================================================
-# EVOLUCIONAR POBLACIÓN PARA UNA CLASE (NICHO ESPECÍFICO)
+# EVOLUCIONAR POBLACIÓN PARA UNA CLASE (BÚSQUEDA TABÚ MULTI-INTENTO)
 # =========================================================
 
 def evolucionar_poblacion_clase(
     clase_objetivo,
     datos_fuzzificados,
-    num_generaciones=NUM_GENERACIONES
+    num_intentos=5,
+    gens_por_intento=35
 ):
     """
     Evoluciona una población especializada en una clase de salida específica.
-    Garantiza que la clase objetivo no sea canibalizada por clases mayoritarias.
+    Utiliza búsqueda multi-intento con penalización tabú para descubrir múltiples
+    reglas diversas y complementarias con al menos 2 antecedentes.
     """
 
-    poblacion = crear_poblacion_inicial(
-        consecuente_fijo=clase_objetivo
-    )
+    tabu = set()
+    reglas_encontradas = []
 
-    evaluar_poblacion(
-        poblacion,
-        datos_fuzzificados
-    )
+    for intento in range(num_intentos):
 
-    historial = {
-        "generaciones": [],
-        "fitness": [],
-        "fitness_promedio": []
-    }
-
-    for generacion in range(num_generaciones):
-
-        padres = seleccionar_padres(
-            poblacion
-        )
-
-        hijos = realizar_crossover(
-            padres,
-            consecuente_fijo=clase_objetivo
-        )
-
-        hijos = realizar_mutacion(
-            hijos,
+        poblacion = crear_poblacion_inicial(
             consecuente_fijo=clase_objetivo
         )
 
         evaluar_poblacion(
-            hijos,
+            poblacion,
             datos_fuzzificados
         )
 
-        poblacion = eliminar_peores(
-            poblacion,
-            hijos
-        )
+        for gen in range(gens_por_intento):
 
-        fitnesses = [
-            individuo.fitness.values[0]
-            for individuo in poblacion
-        ]
-
-        mejor_fitness = max(
-            fitnesses
-        )
-
-        promedio_fitness = (
-            sum(fitnesses) / len(fitnesses)
-        )
-
-        historial["generaciones"].append(
-            generacion + 1
-        )
-
-        historial["fitness"].append(
-            mejor_fitness
-        )
-
-        historial["fitness_promedio"].append(
-            promedio_fitness
-        )
-
-        if (generacion + 1) % 25 == 0 or generacion == 0 or (generacion + 1) == num_generaciones:
-            print(
-                f"[{clase_objetivo.upper():^7}] Gen {generacion + 1:03d}/{num_generaciones} "
-                f"| Mejor Fitness = {mejor_fitness:.6f} "
-                f"| Promedio = {promedio_fitness:.6f}"
+            padres = seleccionar_padres(
+                poblacion
             )
 
-    # Extraer reglas únicas encontradas en la población final
-    reglas = []
-    reglas_vistas = set()
+            hijos = realizar_crossover(
+                padres,
+                consecuente_fijo=clase_objetivo
+            )
 
-    for individuo in poblacion:
+            hijos = realizar_mutacion(
+                hijos,
+                consecuente_fijo=clase_objetivo
+            )
 
-        ant = tuple(individuo[:-1])
+            # Reparar si algún hijo mutó a menos de 2 antecedentes
+            for h in hijos:
 
-        if ant in reglas_vistas:
+                while sum(1 for g in h[:-1] if g != NO_USAR) < 2:
 
-            continue
+                    inactivos = [
+                        idx for idx, g in enumerate(h[:-1])
+                        if g == NO_USAR
+                    ]
 
-        reglas_vistas.add(ant)
+                    if not inactivos:
+                        break
 
-        metricas = calcular_metricas(
-            individuo,
-            datos_fuzzificados
-        )
+                    idx = random.choice(inactivos)
+                    h[idx] = random.choice(
+                        CONJUNTOS[VARIABLES_ENTRADA[idx]]
+                    )
 
-        reglas.append({
-            "individuo": list(individuo),
-            "support": metricas["support"],
-            "confidence": metricas["confidence"],
-            "coverage": metricas["coverage"],
-            "lift": metricas["lift"],
-            "fitness": metricas["fitness"]
-        })
+            evaluar_poblacion(
+                hijos,
+                datos_fuzzificados
+            )
 
-    reglas.sort(
+            # Penalización tabú para forzar exploración de nuevas combinaciones
+            if tabu:
+
+                for h in hijos:
+
+                    ant = tuple(h[:-1])
+
+                    if ant in tabu:
+
+                        h.fitness.values = (
+                            h.fitness.values[0] * 0.05,
+                        )
+
+            poblacion = eliminar_peores(
+                poblacion,
+                hijos
+            )
+
+        # Extraer los mejores individuos únicos de este intento
+        for individuo in poblacion[:5]:
+
+            ant = tuple(individuo[:-1])
+            metricas = calcular_metricas(
+                individuo,
+                datos_fuzzificados
+            )
+
+            if metricas["fitness"] > 0 and ant not in tabu:
+
+                tabu.add(ant)
+
+                reglas_encontradas.append({
+                    "individuo": list(individuo),
+                    "support": metricas["support"],
+                    "confidence": metricas["confidence"],
+                    "coverage": metricas["coverage"],
+                    "lift": metricas["lift"],
+                    "fitness": metricas["fitness"]
+                })
+
+    reglas_encontradas.sort(
         key=lambda r: r["fitness"],
         reverse=True
     )
 
-    return reglas, historial
+    return reglas_encontradas, {}
 
 
 # =========================================================
-# EJECUTAR ALGORITMO GENÉTICO (MULTICLASE CON NICHOS)
+# EJECUTAR ALGORITMO GENÉTICO (MULTICLASE CON NICHOS Y TABÚ)
 # =========================================================
 
 def ejecutar_algoritmo_genetico(datos_fuzzificados):
     """
-    Ejecuta el Algoritmo Genético Multiclase con Nichos.
+    Ejecuta el Algoritmo Genético Multiclase con Nichos y Búsqueda Tabú.
     Evoluciona independientemente para cada clase de salida (nulo, bajo, alto, extremo)
-    para evitar la exclusión competitiva y garantizar la completitud del sistema difuso.
+    extrayendo múltiples reglas contextuales diversas de alta confianza.
     """
 
     clases = CONJUNTOS[VARIABLE_SALIDA]
@@ -191,21 +186,20 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
         reglas_clase, historial_clase = evolucionar_poblacion_clase(
             clase,
             datos_fuzzificados,
-            num_generaciones=NUM_GENERACIONES
+            num_intentos=5,
+            gens_por_intento=35
         )
 
         historial_global[clase] = historial_clase
 
         print(f"Reglas únicas encontradas para '{clase}': {len(reglas_clase)}")
 
-        if reglas_clase:
+        for idx, regla in enumerate(reglas_clase[:5], start=1):
 
-            mejor = reglas_clase[0]
-            print(f"-> Mejor regla: {convertir_regla_texto(mejor['individuo'])}")
-            print(f"   Confianza = {mejor['confidence']:.4f} | Cobertura = {mejor['coverage']:.4f} | Fitness = {mejor['fitness']:.4f}")
+            print(f"  [{idx}] {convertir_regla_texto(regla['individuo'])}")
+            print(f"      Confianza = {regla['confidence']:.4f} | Cobertura = {regla['coverage']:.4f} | Fitness = {regla['fitness']:.4f}")
 
-            # Guardamos las mejores reglas de esta clase (hasta 5 mejores)
-            todas_las_reglas.extend(reglas_clase[:5])
+            todas_las_reglas.append(regla)
 
     # Ordenar por fitness descendente
     todas_las_reglas.sort(

@@ -206,18 +206,78 @@ class Aplicacion:
 
 
         # -------------------------------------------------
-        # BOTÓN
+        # BOTONES DE PREAJUSTES PARA DEMOSTRACIÓN / DEFENSA
+        # -------------------------------------------------
+
+        frame_presets = ttk.LabelFrame(
+            self.root,
+            text="Escenarios Predefinidos de Prueba (Para Demostración / Defensa)",
+            padding=10
+        )
+        frame_presets.pack(
+            padx=20,
+            pady=5,
+            fill="x"
+        )
+
+        btn_nulo = ttk.Button(
+            frame_presets,
+            text="1. Invernal (Nulo)",
+            command=lambda: self.cargar_caso({
+                'T_media': -10.0, 'HR_media': 85.0, 'Viento_medio': 1.0,
+                'Precipitacion': 0.05, 'FFMC': 10.0, 'DMC': 80.0,
+                'DC': 550.0, 'KBDI': 150.0
+            })
+        )
+        btn_nulo.pack(side="left", padx=5, expand=True, fill="x")
+
+        btn_bajo = ttk.Button(
+            frame_presets,
+            text="2. Moderado (Bajo)",
+            command=lambda: self.cargar_caso({
+                'T_media': 12.0, 'HR_media': 75.0, 'Viento_medio': 2.0,
+                'Precipitacion': 0.001, 'FFMC': 70.0, 'DMC': 25.0,
+                'DC': 150.0, 'KBDI': 15.0
+            })
+        )
+        btn_bajo.pack(side="left", padx=5, expand=True, fill="x")
+
+        btn_alto = ttk.Button(
+            frame_presets,
+            text="3. Seco/Viento (Alto)",
+            command=lambda: self.cargar_caso({
+                'T_media': 8.0, 'HR_media': 30.0, 'Viento_medio': 2.0,
+                'Precipitacion': 0.0, 'FFMC': 92.0, 'DMC': 35.0,
+                'DC': 450.0, 'KBDI': 1.0
+            })
+        )
+        btn_alto.pack(side="left", padx=5, expand=True, fill="x")
+
+        btn_extremo = ttk.Button(
+            frame_presets,
+            text="4. Ola Calor (Extremo)",
+            command=lambda: self.cargar_caso({
+                'T_media': 25.0, 'HR_media': 55.0, 'Viento_medio': 2.8,
+                'Precipitacion': 0.0, 'FFMC': 87.0, 'DMC': 130.0,
+                'DC': 550.0, 'KBDI': 80.0
+            })
+        )
+        btn_extremo.pack(side="left", padx=5, expand=True, fill="x")
+
+        # -------------------------------------------------
+        # BOTÓN CALCULAR
         # -------------------------------------------------
 
         boton = ttk.Button(
             self.root,
-            text="CALCULAR RIESGO",
+            text="CALCULAR RIESGO MANUAL",
             command=self.calcular
         )
 
         boton.pack(
-            pady=15
+            pady=10
         )
+
 
 
         # -------------------------------------------------
@@ -371,10 +431,23 @@ class Aplicacion:
 
 
     # =====================================================
+    # CARGAR CASO PREESTABLECIDO
+    # =====================================================
+
+    def cargar_caso(self, valores):
+        for variable, valor in valores.items():
+            if variable in self.entries:
+                self.entries[variable].delete(0, tk.END)
+                self.entries[variable].insert(0, str(valor))
+        self.calcular()
+
+
+    # =====================================================
     # CALCULAR
     # =====================================================
 
     def calcular(self):
+
 
         entradas = {}
 

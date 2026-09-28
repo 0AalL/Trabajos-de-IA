@@ -56,25 +56,22 @@ def mutar_individuo(
         )
 
     # --------------------------------------------------------
-    # Evitar antecedente completamente vacío
+    # Evitar regla con menos de 2 antecedentes
     # --------------------------------------------------------
 
-    if all(
-        gen == NO_USAR
-        for gen in individuo[:-1]
-    ):
+    while sum(1 for gen in individuo[:-1] if gen != NO_USAR) < 2:
 
-        indice = random.randrange(
-            len(VARIABLES_ENTRADA)
-        )
-
-        variable = VARIABLES_ENTRADA[
-            indice
+        inactivos = [
+            idx for idx, gen in enumerate(individuo[:-1])
+            if gen == NO_USAR
         ]
 
-        individuo[indice] = random.choice(
-            CONJUNTOS[variable]
-        )
+        if not inactivos:
+            break
+
+        indice = random.choice(inactivos)
+        variable = VARIABLES_ENTRADA[indice]
+        individuo[indice] = random.choice(CONJUNTOS[variable])
 
     # --------------------------------------------------------
     # Invalidar fitness
