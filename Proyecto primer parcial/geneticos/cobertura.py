@@ -41,10 +41,17 @@ def regla_cubre_combinacion(
 
         gen = regla[i]
 
-        # Comodín
+        # ----------------------------------------------------
+        # NO_USAR = COMODÍN
+        # ----------------------------------------------------
+
         if gen == NO_USAR:
 
             continue
+
+        # ----------------------------------------------------
+        # La condición debe coincidir
+        # ----------------------------------------------------
 
         if gen != combinacion[i]:
 
@@ -54,7 +61,7 @@ def regla_cubre_combinacion(
 
 
 # ============================================================
-# COMBINACIONES CUBIERTAS
+# COMBINACIONES CUBIERTAS POR REGLA
 # ============================================================
 
 def combinaciones_cubiertas_por_regla(
@@ -88,6 +95,10 @@ def seleccionar_reglas_por_cobertura(
     reglas,
     min_reglas_por_clase=5
 ):
+
+    # --------------------------------------------------------
+    # Generar todas las combinaciones
+    # --------------------------------------------------------
 
     combinaciones = (
         generar_combinaciones_entrada()
@@ -150,7 +161,18 @@ def seleccionar_reglas_por_cobertura(
             )
         )
 
-        nuevas = nuevas - cubiertas
+        # ----------------------------------------------------
+        # Solo nos interesan las combinaciones que todavía
+        # no estaban cubiertas.
+        # ----------------------------------------------------
+
+        nuevas = (
+            nuevas - cubiertas
+        )
+
+        # ----------------------------------------------------
+        # Si la regla aporta cobertura nueva, se conserva.
+        # ----------------------------------------------------
 
         if nuevas:
 
@@ -162,9 +184,21 @@ def seleccionar_reglas_por_cobertura(
                 nuevas
             )
 
+        # ----------------------------------------------------
+        # Si ya cubrimos todo, terminamos.
+        # ----------------------------------------------------
+
         if cubiertas == todas:
 
             break
+
+    # --------------------------------------------------------
+    # Faltantes
+    # --------------------------------------------------------
+
+    faltantes = (
+        todas - cubiertas
+    )
 
     return (
         reglas_finales,

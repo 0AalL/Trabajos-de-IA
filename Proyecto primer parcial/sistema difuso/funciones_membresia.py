@@ -47,9 +47,8 @@ def crear_funciones_membresia():
 
         for conjunto, parametros in conjuntos.items():
 
-            # Todas las funciones actuales tienen
-            # cuatro parámetros [a, b, c, d],
-            # por lo tanto se utiliza trapmf.
+            # Todas las funciones utilizan cuatro parámetros
+            # [a, b, c, d], por lo que se utiliza trapmf.
 
             funciones[variable][conjunto] = (
                 crear_trapezoidal(
