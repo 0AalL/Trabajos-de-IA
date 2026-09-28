@@ -122,13 +122,13 @@ RANGOS = {
         100.0
     ),
 
-    # Velocidad media del viento
+    # Velocidad media del viento (m/s)
     "Viento_medio": (
         0.0,
         15.0
     ),
 
-    # Precipitación
+    # Precipitación (mm)
     "Precipitacion": (
         0.0,
         100.0
@@ -276,8 +276,6 @@ PARAMETROS_MEMBRESIA = {
 
     # ========================================================
     # Precipitacion
-    #
-    # Rango expresado en mm.
     # ========================================================
 
     "Precipitacion": {
@@ -462,30 +460,36 @@ PARAMETROS_MEMBRESIA = {
 
     "Area Quemada (Ha)": {
 
+        # Área prácticamente nula
         "null": [
             0.0,
             0.0,
-            0.01,
-            0.1
-        ],
-
-        "low": [
-            0.01,
             0.1,
-            10.0,
-            50.0
+            1.0
         ],
 
+        # Área pequeña
+        # Llega hasta 80 ha
+        "low": [
+            0.1,
+            1.0,
+            20.0,
+            80.0
+        ],
+
+        # Área alta
+        # Existe solapamiento con LOW
         "high": [
-            10.0,
             50.0,
+            80.0,
             500.0,
-            2000.0
+            5000.0
         ],
 
+        # Área extremadamente grande
         "extreme": [
             500.0,
-            2000.0,
+            5000.0,
             1889779.32,
             1889779.32
         ]
@@ -547,6 +551,8 @@ UNIVERSOS = {
         0.1
     ),
 
+    # Se mantiene el universo completo para
+    # inferencia y defuzzificación.
     "Area Quemada (Ha)": np.arange(
         0.0,
         1889779.33,
