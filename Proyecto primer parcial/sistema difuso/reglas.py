@@ -79,7 +79,7 @@ def parsear_regla(texto):
     ).strip()
 
     consecuente = consecuente.replace(
-        "incendio=",
+        "Area Quemada (Ha)=",
         ""
     ).strip()
 
@@ -149,5 +149,5 @@ def regla_a_texto(regla):
 
     return (
         f"IF {antecedente} "
-        f"THEN incendio={regla['consecuente']}"
+        f"THEN Area Quemada (Ha)={regla['consecuente']}"
     )

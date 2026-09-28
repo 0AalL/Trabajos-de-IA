@@ -1,4 +1,4 @@
-import numpy as np
+# pyrefly: ignore [missing-import]
 import skfuzzy as fuzz
 
 from configuracion import (

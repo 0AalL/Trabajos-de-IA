@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import skfuzzy as fuzz
 
 
@@ -35,15 +36,15 @@ def clasificar_riesgo(
     porcentaje
 ):
 
-    if porcentaje < 33.334:
+    if porcentaje < 0.02:
 
         return "NONEXISTENT"
 
-    elif porcentaje < 66.666:
+    elif porcentaje < 10.0:
 
         return "LOW"
 
-    elif porcentaje < 100:
+    elif porcentaje < 366.0:
 
         return "HIGH"
 

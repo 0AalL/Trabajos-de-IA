@@ -130,20 +130,14 @@ class Aplicacion:
         # -------------------------------------------------
 
         nombres = {
-
-            "temperatura": "Temperatura (°C)",
-
-            "humedad": "Humedad (%)",
-
-            "viento": "Viento",
-
-            "precipitacion": "Precipitación",
-
-            "co2": "CO₂",
-
-            "co": "CO",
-
-            "oxigeno": "Oxígeno (%)"
+            "T_mean": "Temperatura (°C)",
+            "RH_mean": "Humedad (%)",
+            "Wind_mean": "Viento (m/s)",
+            "PPT_tot": "Precipitación (mm)",
+            "FFMC": "FFMC (Combustible Fino)",
+            "DMC": "DMC (Capa Orgánica)",
+            "DC": "DC (Sequía)",
+            "KBDI": "KBDI"
         }
 
 
@@ -245,7 +239,7 @@ class Aplicacion:
 
         self.resultado = ttk.Label(
             frame_resultado,
-            text="Riesgo: -- %",
+            text="Área Quemada: -- Ha",
             font=("Arial", 26, "bold")
         )
 
@@ -360,7 +354,7 @@ class Aplicacion:
 
             "Defuzzificación: CENTROIDE\n\n"
 
-            "Universo de salida: 0 - 100 %"
+            "Universo de salida: Hectáreas Quemadas"
         )
 
 
@@ -507,7 +501,7 @@ class Aplicacion:
         # -------------------------------------------------
 
         self.resultado.config(
-            text=f"Riesgo: {porcentaje:.2f} %"
+            text=f"Área Estimada: {porcentaje:.2f} Ha"
         )
 
         self.clasificacion.config(

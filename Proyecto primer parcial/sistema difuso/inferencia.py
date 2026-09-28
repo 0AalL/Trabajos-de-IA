@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import numpy as np
 
 from configuracion import (
@@ -113,7 +114,7 @@ def agregar_salidas(
 ):
 
     universo = UNIVERSOS[
-        "incendio"
+        "Area Quemada (Ha)"
     ]
 
     salida_agregada = np.zeros(
@@ -135,7 +136,7 @@ def agregar_salidas(
         ]
 
         funcion_salida = FUNCIONES[
-            "incendio"
+            "Area Quemada (Ha)"
         ][
             consecuente
         ]
