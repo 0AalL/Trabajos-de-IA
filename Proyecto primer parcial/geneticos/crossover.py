@@ -10,7 +10,8 @@ from configuracion import PROB_CRUCE
 
 def crossover(
     padre1,
-    padre2
+    padre2,
+    consecuente_fijo=None
 ):
 
     hijo1 = copy.deepcopy(
@@ -33,6 +34,10 @@ def crossover(
             hijo1[punto:]
         )
 
+    if consecuente_fijo is not None:
+        hijo1[-1] = consecuente_fijo
+        hijo2[-1] = consecuente_fijo
+
     # El fitness anterior ya no es válido
     if hijo1.fitness.valid:
 
@@ -50,7 +55,8 @@ def crossover(
 # ============================================================
 
 def realizar_crossover(
-    padres
+    padres,
+    consecuente_fijo=None
 ):
 
     hijos = []
@@ -73,7 +79,8 @@ def realizar_crossover(
 
         hijo1, hijo2 = crossover(
             padre1,
-            padre2
+            padre2,
+            consecuente_fijo=consecuente_fijo
         )
 
         hijos.append(

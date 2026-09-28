@@ -36,15 +36,15 @@ def clasificar_riesgo(
     porcentaje
 ):
 
-    if porcentaje < 0.02:
+    if porcentaje < 5.0:
 
         return "NULO"
 
-    elif porcentaje < 10.0:
+    elif porcentaje < 50.0:
 
         return "BAJO"
 
-    elif porcentaje < 366.0:
+    elif porcentaje < 1000.0:
 
         return "ALTO"
 

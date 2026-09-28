@@ -8,7 +8,8 @@ from configuracion import (
     SEMILLA,
     ARCHIVO_REGLAS_ULTIMA_GENERACION,
     VARIABLES_ENTRADA,
-    VARIABLE_SALIDA
+    VARIABLE_SALIDA,
+    CONJUNTOS
 )
 
 from poblacion_inicial import crear_poblacion_inicial
@@ -33,8 +34,6 @@ random.seed(SEMILLA)
 def evaluar_poblacion(poblacion, datos_fuzzificados):
     """
     Calcula el fitness de todos los individuos de una población.
-
-    El fitness está definido únicamente como el Lift de la regla.
     """
 
     for individuo in poblacion:
@@ -45,90 +44,59 @@ def evaluar_poblacion(poblacion, datos_fuzzificados):
 
 
 # =========================================================
-# EJECUTAR ALGORITMO GENÉTICO
+# EVOLUCIONAR POBLACIÓN PARA UNA CLASE (NICHO ESPECÍFICO)
 # =========================================================
 
-def ejecutar_algoritmo_genetico(datos_fuzzificados):
+def evolucionar_poblacion_clase(
+    clase_objetivo,
+    datos_fuzzificados,
+    num_generaciones=NUM_GENERACIONES
+):
+    """
+    Evoluciona una población especializada en una clase de salida específica.
+    Garantiza que la clase objetivo no sea canibalizada por clases mayoritarias.
+    """
 
-    # -----------------------------------------------------
-    # 1. CREAR POBLACIÓN INICIAL
-    # -----------------------------------------------------
+    poblacion = crear_poblacion_inicial(
+        consecuente_fijo=clase_objetivo
+    )
 
-    poblacion = crear_poblacion_inicial()
-
-    # Evaluar población inicial
     evaluar_poblacion(
         poblacion,
         datos_fuzzificados
     )
 
-    # Historial para guardar la evolución
     historial = {
         "generaciones": [],
         "fitness": [],
         "fitness_promedio": []
     }
 
-    # -----------------------------------------------------
-    # 2. EVOLUCIÓN
-    # -----------------------------------------------------
-
-    for generacion in range(NUM_GENERACIONES):
-
-        # -------------------------------------------------
-        # SELECCIÓN
-        # -------------------------------------------------
+    for generacion in range(num_generaciones):
 
         padres = seleccionar_padres(
             poblacion
         )
 
-        # -------------------------------------------------
-        # CROSSOVER
-        # -------------------------------------------------
-
         hijos = realizar_crossover(
-            padres
+            padres,
+            consecuente_fijo=clase_objetivo
         )
-
-        # -------------------------------------------------
-        # MUTACIÓN
-        # -------------------------------------------------
 
         hijos = realizar_mutacion(
-            hijos
+            hijos,
+            consecuente_fijo=clase_objetivo
         )
-
-        # -------------------------------------------------
-        # EVALUACIÓN DE LOS HIJOS
-        # -------------------------------------------------
 
         evaluar_poblacion(
             hijos,
             datos_fuzzificados
         )
 
-        # -------------------------------------------------
-        # ELIMINACIÓN
-        # -------------------------------------------------
-        #
-        # Se juntan:
-        #
-        #   población actual + hijos
-        #
-        # y se conservan los mejores individuos.
-        #
-        # Esto corresponde a una estrategia (μ + λ).
-        # -------------------------------------------------
-
         poblacion = eliminar_peores(
             poblacion,
             hijos
         )
-
-        # -------------------------------------------------
-        # CALCULAR ESTADÍSTICAS
-        # -------------------------------------------------
 
         fitnesses = [
             individuo.fitness.values[0]
@@ -143,10 +111,6 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
             sum(fitnesses) / len(fitnesses)
         )
 
-        # -------------------------------------------------
-        # GUARDAR HISTORIAL
-        # -------------------------------------------------
-
         historial["generaciones"].append(
             generacion + 1
         )
@@ -159,110 +123,118 @@ def ejecutar_algoritmo_genetico(datos_fuzzificados):
             promedio_fitness
         )
 
-        # -------------------------------------------------
-        # MOSTRAR PROGRESO
-        # -------------------------------------------------
+        if (generacion + 1) % 25 == 0 or generacion == 0 or (generacion + 1) == num_generaciones:
+            print(
+                f"[{clase_objetivo.upper():^7}] Gen {generacion + 1:03d}/{num_generaciones} "
+                f"| Mejor Fitness = {mejor_fitness:.6f} "
+                f"| Promedio = {promedio_fitness:.6f}"
+            )
 
-        print(
-            f"Generación "
-            f"{generacion + 1:03d}/{NUM_GENERACIONES} "
-            f"| Mejor Fitness = {mejor_fitness:.6f} "
-            f"| Fitness Promedio = {promedio_fitness:.6f}"
-        )
-
-    # =====================================================
-    # 3. OBTENER REGLAS DE LA ÚLTIMA GENERACIÓN
-    # =====================================================
-
+    # Extraer reglas únicas encontradas en la población final
     reglas = []
+    reglas_vistas = set()
 
     for individuo in poblacion:
 
-        # Calcular nuevamente todas las métricas
+        ant = tuple(individuo[:-1])
+
+        if ant in reglas_vistas:
+
+            continue
+
+        reglas_vistas.add(ant)
+
         metricas = calcular_metricas(
             individuo,
             datos_fuzzificados
         )
 
-        regla = {
+        reglas.append({
             "individuo": list(individuo),
-
             "support": metricas["support"],
-
             "confidence": metricas["confidence"],
-
             "coverage": metricas["coverage"],
-
             "lift": metricas["lift"],
-
             "fitness": metricas["fitness"]
-        }
-
-        reglas.append(
-            regla
-        )
-
-    # =====================================================
-    # 4. ORDENAR REGLAS POR FITNESS
-    # =====================================================
-    #
-    # Como:
-    #
-    #     Fitness = Lift
-    #
-    # ordenar por fitness equivale a ordenar por Lift.
-    # =====================================================
+        })
 
     reglas.sort(
+        key=lambda r: r["fitness"],
+        reverse=True
+    )
+
+    return reglas, historial
+
+
+# =========================================================
+# EJECUTAR ALGORITMO GENÉTICO (MULTICLASE CON NICHOS)
+# =========================================================
+
+def ejecutar_algoritmo_genetico(datos_fuzzificados):
+    """
+    Ejecuta el Algoritmo Genético Multiclase con Nichos.
+    Evoluciona independientemente para cada clase de salida (nulo, bajo, alto, extremo)
+    para evitar la exclusión competitiva y garantizar la completitud del sistema difuso.
+    """
+
+    clases = CONJUNTOS[VARIABLE_SALIDA]
+    todas_las_reglas = []
+    historial_global = {}
+
+    for clase in clases:
+
+        print()
+        print("=" * 60)
+        print(f"EVOLUCIÓN DE NICHO PARA CLASE DE RIESGO: {clase.upper()}")
+        print("=" * 60)
+
+        reglas_clase, historial_clase = evolucionar_poblacion_clase(
+            clase,
+            datos_fuzzificados,
+            num_generaciones=NUM_GENERACIONES
+        )
+
+        historial_global[clase] = historial_clase
+
+        print(f"Reglas únicas encontradas para '{clase}': {len(reglas_clase)}")
+
+        if reglas_clase:
+
+            mejor = reglas_clase[0]
+            print(f"-> Mejor regla: {convertir_regla_texto(mejor['individuo'])}")
+            print(f"   Confianza = {mejor['confidence']:.4f} | Cobertura = {mejor['coverage']:.4f} | Fitness = {mejor['fitness']:.4f}")
+
+            # Guardamos las mejores reglas de esta clase (hasta 5 mejores)
+            todas_las_reglas.extend(reglas_clase[:5])
+
+    # Ordenar por fitness descendente
+    todas_las_reglas.sort(
         key=lambda regla: regla["fitness"],
         reverse=True
     )
 
-    # =====================================================
-    # 5. GUARDAR REGLAS DE LA ÚLTIMA GENERACIÓN
-    # =====================================================
-
+    # Guardar en archivo reglas_ultima_generacion.csv
     filas = []
 
-    for numero, regla in enumerate(
-        reglas,
-        start=1
-    ):
+    for numero, regla in enumerate(todas_las_reglas, start=1):
 
-        filas.append(
-            {
-                "numero": numero,
+        filas.append({
+            "numero": numero,
+            "regla": convertir_regla_texto(regla["individuo"]),
+            "support": regla["support"],
+            "confidence": regla["confidence"],
+            "coverage": regla["coverage"],
+            "lift": regla["lift"],
+            "fitness": regla["fitness"]
+        })
 
-                "regla": convertir_regla_texto(
-                    regla["individuo"]
-                ),
-
-                "support": regla["support"],
-
-                "confidence": regla["confidence"],
-
-                "coverage": regla["coverage"],
-
-                "lift": regla["lift"],
-
-                "fitness": regla["fitness"]
-            }
-        )
-
-    df_reglas = pd.DataFrame(
-        filas
-    )
-
+    df_reglas = pd.DataFrame(filas)
     df_reglas.to_csv(
         ARCHIVO_REGLAS_ULTIMA_GENERACION,
         index=False
     )
 
-    # =====================================================
-    # 6. RETORNAR RESULTADOS
-    # =====================================================
-
-    return reglas, historial
+    return todas_las_reglas, historial_global
 
 
 # =========================================================

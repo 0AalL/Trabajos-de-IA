@@ -45,6 +45,13 @@ def pertenencia_trapezoidal_vec(x, parametros):
 
 def fuzzificar_dataset():
     df = pd.read_csv(ARCHIVO_DATASET)
+    df.rename(columns={
+        "T_mean": "T_media",
+        "RH_mean": "HR_media",
+        "Wind_mean": "Viento_medio",
+        "PPT_tot": "Precipitacion",
+        "Area Burned (Ha)": "Area Quemada (Ha)"
+    }, inplace=True)
     
     datos_fuzzificados = {}
     evidencia = {}

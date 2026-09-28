@@ -7,7 +7,7 @@ from configuracion import TAM_POBLACION
 # CREAR POBLACIÓN INICIAL
 # ============================================================
 
-def crear_poblacion_inicial():
+def crear_poblacion_inicial(consecuente_fijo=None):
 
     poblacion = []
 
@@ -15,7 +15,9 @@ def crear_poblacion_inicial():
         TAM_POBLACION
     ):
 
-        individuo = crear_individuo()
+        individuo = crear_individuo(
+            consecuente_fijo=consecuente_fijo
+        )
 
         poblacion.append(
             individuo

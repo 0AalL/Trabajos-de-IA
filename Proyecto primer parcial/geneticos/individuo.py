@@ -1,5 +1,6 @@
 import random
 
+# pyrefly: ignore [missing-import]
 from deap import base, creator
 
 from configuracion import (
@@ -42,7 +43,9 @@ if not hasattr(
 # CREAR INDIVIDUO
 # ============================================================
 
-def crear_individuo():
+def crear_individuo(
+    consecuente_fijo=None
+):
 
     while True:
 
@@ -83,19 +86,23 @@ def crear_individuo():
         # ====================================================
         # CONSECUENTE
         #
-        # La salida es:
-        #
-        # Area Burned (Ha)
-        #
-        # Se utiliza VARIABLE_SALIDA para evitar nombres
-        # escritos directamente como "incendio".
+        # Si se especifica un consecuente fijo (para nichos/
+        # multiclase), se utiliza ese valor. Si no, se elige al azar.
         # ====================================================
 
-        genes.append(
-            random.choice(
-                CONJUNTOS[VARIABLE_SALIDA]
+        if consecuente_fijo is not None:
+
+            genes.append(
+                consecuente_fijo
             )
-        )
+
+        else:
+
+            genes.append(
+                random.choice(
+                    CONJUNTOS[VARIABLE_SALIDA]
+                )
+            )
 
 
         # ====================================================

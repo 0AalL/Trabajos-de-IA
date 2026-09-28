@@ -14,7 +14,8 @@ from configuracion import (
 # ============================================================
 
 def mutar_individuo(
-    individuo
+    individuo,
+    consecuente_fijo=None
 ):
 
     # --------------------------------------------------------
@@ -44,7 +45,11 @@ def mutar_individuo(
         VARIABLES_ENTRADA
     )
 
-    if random.random() < PROB_MUTACION:
+    if consecuente_fijo is not None:
+
+        individuo[indice_salida] = consecuente_fijo
+
+    elif random.random() < PROB_MUTACION:
 
         individuo[indice_salida] = random.choice(
             CONJUNTOS[VARIABLE_SALIDA]
@@ -87,13 +92,15 @@ def mutar_individuo(
 # ============================================================
 
 def realizar_mutacion(
-    hijos
+    hijos,
+    consecuente_fijo=None
 ):
 
     for hijo in hijos:
 
         mutar_individuo(
-            hijo
+            hijo,
+            consecuente_fijo=consecuente_fijo
         )
 
     return hijos

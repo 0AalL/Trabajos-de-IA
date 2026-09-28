@@ -102,7 +102,48 @@ def seleccionar_reglas_por_cobertura(
 
     reglas_finales = []
 
+    # --------------------------------------------------------
+    # 1. GARANTIZAR COMPLETITUD:
+    # Asegurar al menos la mejor regla de cada clase de salida
+    # --------------------------------------------------------
+
+    clases_vistas = set()
+
     for regla in reglas:
+
+        consecuente = regla["individuo"][-1]
+
+        if consecuente not in clases_vistas:
+
+            clases_vistas.add(
+                consecuente
+            )
+
+            reglas_finales.append(
+                regla
+            )
+
+            nuevas = (
+                combinaciones_cubiertas_por_regla(
+                    regla["individuo"],
+                    combinaciones
+                )
+            )
+
+            cubiertas.update(
+                nuevas
+            )
+
+    # --------------------------------------------------------
+    # 2. SELECCIÓN AVÁRICA POR COBERTURA:
+    # Agregar reglas adicionales que cubran nuevas combinaciones
+    # --------------------------------------------------------
+
+    for regla in reglas:
+
+        if regla in reglas_finales:
+
+            continue
 
         nuevas = (
             combinaciones_cubiertas_por_regla(
