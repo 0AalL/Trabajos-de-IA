@@ -20,6 +20,7 @@ class EditorHistogramasRGB:
         self.altura_previa = None
         self.max_pixeles = 1
         self.barras_objetivo = []
+        self.barras_modificadas = [set(), set(), set()]
         self.fondos = {}
 
         self.figura = Figure(figsize=(11, 7), dpi=85)
@@ -101,6 +102,7 @@ class EditorHistogramasRGB:
     def dibujar(self):
         x = np.arange(256)
         self.barras_objetivo = []
+        self.barras_modificadas = [set(), set(), set()]
         self.fondos.clear()
 
         for c, eje in enumerate(self.ejes):
@@ -213,12 +215,11 @@ class EditorHistogramasRGB:
                 self.altura_previa, altura, len(intensidades)
             )
 
-        barras = []
         for indice, nueva_altura in zip(intensidades, alturas):
             self.objetivos[c, indice] = nueva_altura
             barra = self.barras_objetivo[c][indice]
             barra.set_height(nueva_altura)
-            barras.append(barra)
+            self.barras_modificadas[c].add(int(indice))
 
         self.intensidad_activa = intensidad
         self.altura_previa = altura
@@ -231,8 +232,8 @@ class EditorHistogramasRGB:
             return
 
         self.canvas.restore_region(fondo)
-        for barra in barras:
-            self.ejes[c].draw_artist(barra)
+        for indice in self.barras_modificadas[c]:
+            self.ejes[c].draw_artist(self.barras_objetivo[c][indice])
         self.canvas.blit(self.ejes[c].bbox)
 
     def aplicar(self):
