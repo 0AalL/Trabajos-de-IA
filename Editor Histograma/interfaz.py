@@ -8,8 +8,7 @@ from PIL import Image, ImageTk
 from imagenes import (
     cargar_imagen,
     calcular_histogramas,
-    calcular_histogramas_transformados,
-    transformar_rgb,
+    transformar_canal,
     guardar_imagen
 )
 from histogramas import EditorHistogramasRGB
@@ -35,6 +34,8 @@ class Aplicacion:
         self.ancho_vista = 1
         self.alto_vista = 1
         self.muestras = []
+        self.zoom = 1.0
+        self.escala_ajuste = None
 
         self.crear_interfaz()
 
@@ -58,17 +59,82 @@ class Aplicacion:
         )
         self.estado.pack(side="left", padx=10)
 
+        area_desplazable = tk.Frame(self.ventana)
+        area_desplazable.pack(fill="both", expand=True)
+        self.canvas_pagina = tk.Canvas(
+            area_desplazable, highlightthickness=0
+        )
+        barra_vertical = tk.Scrollbar(
+            area_desplazable,
+            orient="vertical",
+            command=self.canvas_pagina.yview
+        )
+        self.canvas_pagina.configure(yscrollcommand=barra_vertical.set)
+        barra_vertical.pack(side="right", fill="y")
+        self.canvas_pagina.pack(side="left", fill="both", expand=True)
+
+        contenido = tk.Frame(self.canvas_pagina)
+        self.ventana_contenido = self.canvas_pagina.create_window(
+            (0, 0), window=contenido, anchor="nw"
+        )
+        contenido.bind(
+            "<Configure>",
+            lambda evento: self.canvas_pagina.configure(
+                scrollregion=self.canvas_pagina.bbox("all")
+            )
+        )
+        self.canvas_pagina.bind(
+            "<Configure>",
+            lambda evento: self.canvas_pagina.itemconfigure(
+                self.ventana_contenido, width=evento.width
+            )
+        )
+
         marco = tk.LabelFrame(
-            self.ventana, text="Previsualización RGB",
+            contenido, text="Previsualización RGB",
             padx=5, pady=5
         )
         marco.pack(fill="x", padx=10, pady=4)
 
+        controles_imagen = tk.Frame(marco)
+        controles_imagen.pack(fill="x", pady=(0, 4))
+        tk.Button(
+            controles_imagen, text="-", command=lambda: self.cambiar_zoom(0.8)
+        ).pack(side="left", padx=2)
+        tk.Button(
+            controles_imagen, text="+", command=lambda: self.cambiar_zoom(1.25)
+        ).pack(side="left", padx=2)
+        tk.Button(
+            controles_imagen, text="Ajustar", command=self.ajustar_zoom
+        ).pack(side="left", padx=4)
+        tk.Button(
+            controles_imagen, text="Borrar muestras",
+            command=self.borrar_muestras
+        ).pack(side="right", padx=2)
+
+        area_imagen = tk.Frame(marco)
+        area_imagen.pack(fill="both", expand=True)
         self.canvas_imagen = tk.Canvas(
-            marco, height=250, bg="#252525",
+            area_imagen, height=520, bg="#252525",
             highlightthickness=0
         )
-        self.canvas_imagen.pack(fill="x", expand=True)
+        barra_imagen_y = tk.Scrollbar(
+            area_imagen,
+            orient="vertical",
+            command=self.canvas_imagen.yview
+        )
+        barra_imagen_x = tk.Scrollbar(
+            area_imagen,
+            orient="horizontal",
+            command=self.canvas_imagen.xview
+        )
+        self.canvas_imagen.configure(
+            xscrollcommand=barra_imagen_x.set,
+            yscrollcommand=barra_imagen_y.set
+        )
+        barra_imagen_y.pack(side="right", fill="y")
+        barra_imagen_x.pack(side="bottom", fill="x")
+        self.canvas_imagen.pack(side="left", fill="both", expand=True)
 
         self.canvas_imagen.bind(
             "<Motion>", self.mostrar_valores
@@ -91,23 +157,20 @@ class Aplicacion:
         )
         self.info_muestras.pack(fill="x")
 
-        tk.Button(
-            marco,
-            text="Borrar muestras",
-            command=self.borrar_muestras
-        ).pack(anchor="e")
-
         marco_hist = tk.LabelFrame(
-            self.ventana,
+            contenido,
             text="Histograma: original, objetivo y previsualización",
             padx=5, pady=5
         )
         marco_hist.pack(
-            fill="both", expand=True, padx=10, pady=5
+            fill="x", padx=10, pady=5
         )
 
         self.editor = EditorHistogramasRGB(
-            marco_hist, self.actualizar_previsualizacion
+            marco_hist,
+            self.actualizar_previsualizacion,
+            self.actualizar_contraste,
+            self.restablecer_canal_imagen
         )
 
         # Para arrastrar y soltar se necesita tkinterdnd2.
@@ -146,6 +209,8 @@ class Aplicacion:
             self.resultado = self.original.copy()
             self.hist_original = calcular_histogramas(self.original)
             self.hist_objetivo = self.hist_original.astype(float)
+            self.zoom = 1.0
+            self.escala_ajuste = None
 
             self.muestras.clear()
             self.actualizar_texto_muestras()
@@ -164,25 +229,34 @@ class Aplicacion:
         self.canvas_imagen.delete("all")
 
         ancho_canvas = max(self.canvas_imagen.winfo_width(), 700)
-        alto_canvas = 250
+        alto_canvas = max(self.canvas_imagen.winfo_height(), 500)
+        if self.escala_ajuste is None:
+            self.escala_ajuste = min(
+                ancho_canvas / imagen.width,
+                alto_canvas / imagen.height,
+                1.0
+            )
 
-        vista = imagen.copy()
-        vista.thumbnail((ancho_canvas, alto_canvas), Image.Resampling.LANCZOS)
+        escala = self.escala_ajuste * self.zoom
+        escala = min(escala, 6000 / max(imagen.width, imagen.height))
+        ancho_vista = max(1, round(imagen.width * escala))
+        alto_vista = max(1, round(imagen.height * escala))
+        vista = imagen.resize(
+            (ancho_vista, alto_vista), Image.Resampling.BILINEAR
+        )
 
         self.foto = ImageTk.PhotoImage(vista)
 
         self.ancho_vista = vista.width
         self.alto_vista = vista.height
-
-        self.offset_x = (ancho_canvas - vista.width) // 2
-        self.offset_y = (alto_canvas - vista.height) // 2
+        self.offset_x = 0
+        self.offset_y = 0
 
         self.factor_x = imagen.width / vista.width
         self.factor_y = imagen.height / vista.height
 
-        self.canvas_imagen.configure(height=alto_canvas)
         self.canvas_imagen.create_image(
-            self.offset_x, self.offset_y,
+            0, 0,
             image=self.foto, anchor="nw", tags="imagen"
         )
 
@@ -200,23 +274,64 @@ class Aplicacion:
                 text=str(numero), fill="white"
             )
 
-    def actualizar_previsualizacion(self, objetivos):
+        self.canvas_imagen.configure(
+            scrollregion=self.canvas_imagen.bbox("all")
+        )
+
+    def cambiar_zoom(self, factor):
+        if self.resultado is None:
+            return
+        self.zoom = float(np.clip(self.zoom * factor, 0.25, 6.0))
+        self.mostrar_imagen(self.resultado)
+
+    def ajustar_zoom(self):
+        if self.resultado is None:
+            return
+        self.zoom = 1.0
+        self.escala_ajuste = None
+        self.mostrar_imagen(self.resultado)
+
+    def actualizar_previsualizacion(
+        self, objetivos, contrastes, canales_modificados
+    ):
         if self.original is None:
             return False
+        if not canales_modificados:
+            return True
 
         try:
-            self.hist_objetivo = objetivos.copy()
-            self.resultado = transformar_rgb(
-                self.original,
-                self.hist_objetivo,
-                self.hist_original
-            )
+            histograma_nuevo = self.hist_objetivo.copy()
+            transformaciones = {}
+            for canal in canales_modificados:
+                histograma_nuevo[canal] = objetivos[canal]
+                transformaciones[canal] = Image.fromarray(
+                    transformar_canal(
+                        np.asarray(self.original.getchannel(canal)),
+                        histograma_nuevo[canal],
+                        self.hist_original[canal],
+                        contrastes[canal]
+                    )
+                )
 
-            histogramas = calcular_histogramas_transformados(
-                self.hist_original, self.hist_objetivo
+            imagen_actual = (
+                self.resultado
+                if self.resultado is not None
+                else self.original
             )
+            canales_resultado = list(imagen_actual.split())
+            for canal, transformacion in transformaciones.items():
+                canales_resultado[canal] = transformacion
+            self.resultado = Image.merge("RGB", tuple(canales_resultado))
+            self.hist_objetivo = histograma_nuevo
 
-            self.editor.actualizar_actuales(histogramas)
+            histogramas = self.editor.actuales.copy()
+            for canal in canales_modificados:
+                valores = np.asarray(self.resultado.getchannel(canal))
+                histogramas[canal] = np.bincount(
+                    valores.ravel(), minlength=256
+                )
+
+            self.editor.actualizar_actuales(histogramas, canales_modificados)
             self.mostrar_imagen(self.resultado)
 
             self.estado.config(text="Previsualización actualizada.")
@@ -227,9 +342,48 @@ class Aplicacion:
             self.estado.config(text=f"Error: {error}")
             return False
 
+    def actualizar_contraste(self, canal, contraste):
+        if self.original is None:
+            return False
+
+        try:
+            valores = transformar_canal(
+                np.asarray(self.original.getchannel(canal)),
+                self.hist_objetivo[canal],
+                self.hist_original[canal],
+                contraste
+            )
+            canal_resultado = Image.fromarray(valores)
+            canales_resultado = list(self.resultado.split())
+            canales_resultado[canal] = canal_resultado
+            self.resultado = Image.merge("RGB", tuple(canales_resultado))
+
+            histograma = np.bincount(valores.ravel(), minlength=256)
+            self.editor.actualizar_contraste_actual(canal, histograma)
+            self.mostrar_imagen(self.resultado)
+            self.actualizar_texto_muestras()
+            self.estado.config(text="Contraste actualizado.")
+            return True
+        except Exception as error:
+            self.estado.config(text=f"Error: {error}")
+            return False
+
+    def restablecer_canal_imagen(self, canal):
+        if self.original is None:
+            return False
+
+        canales = list(self.resultado.split())
+        canales[canal] = self.original.getchannel(canal)
+        self.resultado = Image.merge("RGB", tuple(canales))
+        self.hist_objetivo[canal] = self.hist_original[canal]
+        self.mostrar_imagen(self.resultado)
+        self.actualizar_texto_muestras()
+        self.estado.config(text="Canal restablecido al original.")
+        return True
+
     def _coordenadas_imagen(self, x, y):
-        px = x - self.offset_x
-        py = y - self.offset_y
+        px = self.canvas_imagen.canvasx(x) - self.offset_x
+        py = self.canvas_imagen.canvasy(y) - self.offset_y
 
         if not (
             0 <= px < self.ancho_vista
@@ -317,6 +471,8 @@ class Aplicacion:
 
         self.resultado = self.original.copy()
         self.hist_objetivo = self.hist_original.astype(float)
+        self.zoom = 1.0
+        self.escala_ajuste = None
 
         self.muestras.clear()
         self.editor.establecer_histogramas(self.hist_original)

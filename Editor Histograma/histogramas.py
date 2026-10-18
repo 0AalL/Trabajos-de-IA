@@ -9,11 +9,21 @@ class EditorHistogramasRGB:
     NOMBRES = ["Rojo (R)", "Verde (G)", "Azul (B)"]
     COLORES = ["red", "green", "blue"]
 
-    def __init__(self, contenedor, al_modificar):
+    def __init__(
+        self,
+        contenedor,
+        al_modificar,
+        al_cambiar_contraste,
+        al_restablecer_canal
+    ):
         self.al_modificar = al_modificar
+        self.al_cambiar_contraste = al_cambiar_contraste
+        self.al_restablecer_canal = al_restablecer_canal
         self.actuales = np.zeros((3, 256), dtype=float)
         self.originales = np.zeros((3, 256), dtype=float)
         self.objetivos = np.zeros((3, 256), dtype=float)
+        self.contrastes = np.ones(3, dtype=float)
+        self.contrastes_aplicados = np.ones(3, dtype=float)
 
         self.canal_activo = None
         self.intensidad_activa = None
@@ -21,7 +31,12 @@ class EditorHistogramasRGB:
         self.max_pixeles = 1
         self.barras_objetivo = []
         self.barras_modificadas = [set(), set(), set()]
+        self.perfiles_originales = []
         self.fondos = {}
+        self.canales_histograma_pendientes = set()
+        self.histogramas_establecidos = False
+        self.arrastrando = False
+        self.botones_contraste = []
 
         self.figura = Figure(figsize=(11, 7), dpi=85)
         self.ejes = [
@@ -57,6 +72,35 @@ class EditorHistogramasRGB:
         )
         self.boton_aplicar.pack(side="right")
 
+        controles_contraste = tk.Frame(contenedor)
+        controles_contraste.pack(fill="x", pady=(0, 4))
+        for canal, nombre in enumerate(("R", "G", "B")):
+            marco_contraste = tk.Frame(controles_contraste)
+            marco_contraste.pack(side="left", fill="x", expand=True, padx=4)
+            tk.Label(marco_contraste, text=f"Contraste {nombre}").pack(
+                side="left", padx=(0, 4)
+            )
+            boton_menos = tk.Button(
+                marco_contraste,
+                text="-",
+                command=lambda canal=canal: self.cambiar_contraste(
+                    canal, -0.1
+                ),
+                state=tk.DISABLED
+            )
+            boton_menos.pack(side="left")
+            tk.Button(
+                marco_contraste,
+                text="+",
+                command=lambda canal=canal: self.cambiar_contraste(
+                    canal, 0.1
+                ),
+                state=tk.DISABLED
+            ).pack(side="left")
+            self.botones_contraste.extend(
+                (boton_menos, marco_contraste.winfo_children()[-1])
+            )
+
         self.canvas = FigureCanvasTkAgg(
             self.figura, master=contenedor
         )
@@ -82,27 +126,36 @@ class EditorHistogramasRGB:
         self.actuales = h.copy()
         self.objetivos = h.copy()
         self.max_pixeles = max(float(h.max()), 1)
+        self.contrastes[:] = 1.0
+        self.contrastes_aplicados[:] = 1.0
+        self.canales_histograma_pendientes.clear()
+        self.histogramas_establecidos = True
+        self.arrastrando = False
         self.boton_aplicar.config(state=tk.DISABLED)
+        self._actualizar_estado_controles()
         for boton in self.botones_restablecer:
             boton.config(state=tk.NORMAL)
 
         self.dibujar()
 
-    def actualizar_actuales(self, histogramas):
-        self.actuales = np.asarray(
-            histogramas, dtype=float
-        ).copy()
+    def actualizar_actuales(self, histogramas, canales):
+        histogramas = np.asarray(histogramas, dtype=float)
+        for canal in canales:
+            self.actuales[canal] = histogramas[canal]
+            self.objetivos[canal] = self.actuales[canal]
+
         self.max_pixeles = max(
             self.max_pixeles,
             float(self.actuales.max()),
             float(self.objetivos.max())
         )
-        self.dibujar()
+        self._actualizar_barras(canales)
 
     def dibujar(self):
         x = np.arange(256)
         self.barras_objetivo = []
         self.barras_modificadas = [set(), set(), set()]
+        self.perfiles_originales = []
         self.fondos.clear()
 
         for c, eje in enumerate(self.ejes):
@@ -119,14 +172,16 @@ class EditorHistogramasRGB:
             for barra in barras.patches:
                 barra.set_animated(True)
 
-            eje.step(
+            perfil, = eje.step(
                 x, self.originales[c],
                 where="mid",
-                color="#888888",
-                linewidth=1.0,
+                color="#333333",
+                linewidth=1.4,
                 linestyle="--",
-                label="Perfil original"
+                label="Perfil original",
+                zorder=5
             )
+            self.perfiles_originales.append(perfil)
 
             eje.set_xlim(0, 255)
             eje.set_ylim(0, self.max_pixeles * 1.05)
@@ -166,10 +221,41 @@ class EditorHistogramasRGB:
             for c, eje in enumerate(self.ejes)
         }
 
-        for eje, barras in zip(self.ejes, self.barras_objetivo):
+        for canal, (eje, barras) in enumerate(
+            zip(self.ejes, self.barras_objetivo)
+        ):
             for barra in barras:
                 eje.draw_artist(barra)
+            eje.draw_artist(self.perfiles_originales[canal])
             self.canvas.blit(eje.bbox)
+
+    def _actualizar_barras(self, canales):
+        for canal in canales:
+            eje = self.ejes[canal]
+            barras = self.barras_objetivo[canal]
+            for intensidad, barra in enumerate(barras):
+                barra.set_height(self.objetivos[canal, intensidad])
+
+            eje.set_ylim(0, self.max_pixeles * 1.05)
+            fondo = self.fondos.get(canal)
+            if fondo is None:
+                self.canvas.draw_idle()
+                continue
+
+            self.canvas.restore_region(fondo)
+            for barra in barras:
+                eje.draw_artist(barra)
+            eje.draw_artist(self.perfiles_originales[canal])
+            self.canvas.blit(eje.bbox)
+
+    def actualizar_contraste_actual(self, canal, histograma):
+        self.actuales[canal] = np.asarray(histograma, dtype=float)
+        if canal not in self.canales_histograma_pendientes:
+            self.objetivos[canal] = self.actuales[canal]
+            self.max_pixeles = max(
+                self.max_pixeles, float(self.actuales[canal].max())
+            )
+            self._actualizar_barras([canal])
 
     def al_presionar(self, evento):
         if (
@@ -183,6 +269,8 @@ class EditorHistogramasRGB:
         self.canal_activo = self.ejes.index(evento.inaxes)
         self.intensidad_activa = None
         self.altura_previa = None
+        self.arrastrando = True
+        self._actualizar_estado_controles()
         self._editar(evento.xdata, evento.ydata)
 
     def al_mover(self, evento):
@@ -220,6 +308,7 @@ class EditorHistogramasRGB:
             barra = self.barras_objetivo[c][indice]
             barra.set_height(nueva_altura)
             self.barras_modificadas[c].add(int(indice))
+        self.canales_histograma_pendientes.add(c)
 
         self.intensidad_activa = intensidad
         self.altura_previa = altura
@@ -234,34 +323,91 @@ class EditorHistogramasRGB:
         self.canvas.restore_region(fondo)
         for indice in self.barras_modificadas[c]:
             self.ejes[c].draw_artist(self.barras_objetivo[c][indice])
+        self.ejes[c].draw_artist(self.perfiles_originales[c])
         self.canvas.blit(self.ejes[c].bbox)
 
     def aplicar(self):
-        aplicado = self.al_modificar(self.objetivos.copy())
+        canales_modificados = sorted(self.canales_histograma_pendientes)
+        if not canales_modificados:
+            return
+
+        aplicado = self.al_modificar(
+            self.objetivos.copy(), self.contrastes.copy(), canales_modificados
+        )
         if aplicado is not False:
-            self.objetivos = self.actuales.copy()
-            self._actualizar_estado_aplicar()
-            self.dibujar()
+            self.canales_histograma_pendientes.difference_update(
+                canales_modificados
+            )
+            self._actualizar_barras(canales_modificados)
+            self._actualizar_estado_controles()
+
+    def cambiar_contraste(self, canal, incremento):
+        if (
+            not self.histogramas_establecidos
+            or self.arrastrando
+            or self.canales_histograma_pendientes
+        ):
+            return
+
+        nuevo_contraste = np.clip(
+            round(self.contrastes[canal] + incremento, 1), 1.0, 3.0
+        )
+        if np.isclose(nuevo_contraste, self.contrastes[canal]):
+            return
+
+        aplicado = self.al_cambiar_contraste(canal, nuevo_contraste)
+        if aplicado is not False:
+            self.contrastes[canal] = nuevo_contraste
+            self.contrastes_aplicados[canal] = nuevo_contraste
+            self._actualizar_estado_controles()
 
     def _actualizar_estado_aplicar(self):
-        pendientes = not np.allclose(self.objetivos, self.actuales)
+        pendientes = bool(self.canales_histograma_pendientes)
         self.boton_aplicar.config(
             state=tk.NORMAL if pendientes else tk.DISABLED
         )
 
-    def restablecer_canal(self, canal):
-        self.objetivos[canal] = self.originales[canal]
-        self.dibujar()
+    def _actualizar_estado_controles(self):
         self._actualizar_estado_aplicar()
+        estado = (
+            tk.NORMAL
+            if self.histogramas_establecidos
+            and not self.arrastrando
+            and not self.canales_histograma_pendientes
+            else tk.DISABLED
+        )
+        for boton in self.botones_contraste:
+            boton.config(state=estado)
+
+    def restablecer_canal(self, canal):
+        aplicado = self.al_restablecer_canal(canal)
+        if aplicado is False:
+            return
+
+        self.actuales[canal] = self.originales[canal]
+        self.objetivos[canal] = self.originales[canal]
+        self.contrastes[canal] = 1.0
+        self.contrastes_aplicados[canal] = 1.0
+        self.canales_histograma_pendientes.discard(canal)
+        self._actualizar_barras([canal])
+        self._actualizar_estado_controles()
 
     def al_soltar(self, evento):
         self.canal_activo = None
         self.intensidad_activa = None
         self.altura_previa = None
+        self.arrastrando = False
+        self._actualizar_estado_controles()
 
     def restablecer(self):
         self.actuales = self.originales.copy()
         self.objetivos = self.originales.copy()
+        self.contrastes[:] = 1.0
+        self.contrastes_aplicados[:] = 1.0
+        self.canales_histograma_pendientes.clear()
+        self.arrastrando = False
         self.dibujar()
-        self.al_modificar(self.objetivos.copy())
-        self.boton_aplicar.config(state=tk.DISABLED)
+        self.al_modificar(
+            self.objetivos.copy(), self.contrastes.copy(), [0, 1, 2]
+        )
+        self._actualizar_estado_controles()

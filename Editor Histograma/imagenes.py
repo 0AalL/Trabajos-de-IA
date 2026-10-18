@@ -226,8 +226,27 @@ def calcular_histogramas_transformados(histogramas_origen, histogramas_objetivo)
     return salida
 
 
+def transformar_canal(
+    canal_original, histograma_objetivo, histograma_origen, contraste=1.0
+):
+    """Transforma un solo canal para evitar recorrer los demás."""
+    canal = np.asarray(canal_original, dtype=np.uint8)
+    origen = np.asarray(histograma_origen, dtype=np.int64)
+    objetivo = np.asarray(histograma_objetivo, dtype=float)
+
+    _, movimientos = _construir_redistribucion(origen, objetivo)
+    valores = _aplicar_movimientos(canal, movimientos).astype(float)
+    factor = float(np.clip(np.nan_to_num(contraste, nan=1.0), 1.0, 3.0))
+    valores = (valores - 127.5) * factor + 127.5
+
+    return np.clip(np.rint(valores), 0, 255).astype(np.uint8)
+
+
 def transformar_rgb(
-    imagen_original, histogramas_objetivo, histogramas_origen=None
+    imagen_original,
+    histogramas_objetivo,
+    histogramas_origen=None,
+    contrastes=None
 ):
     """
     Transforma cada canal por separado a partir de la imagen original.
@@ -246,15 +265,24 @@ def transformar_rgb(
             "Se esperaban tres histogramas de 256 intensidades."
         )
 
+    if contrastes is None:
+        contrastes = np.ones(3, dtype=float)
+    else:
+        contrastes = np.asarray(contrastes, dtype=float)
+        if contrastes.shape != (3,):
+            raise ValueError("Se esperaban tres factores de contraste.")
+        contrastes = np.clip(
+            np.nan_to_num(contrastes, nan=1.0), 1.0, 3.0
+        )
+
     salida = np.empty_like(rgb)
 
     for canal in range(3):
-        _, movimientos = _construir_redistribucion(
+        salida[:, :, canal] = transformar_canal(
+            rgb[:, :, canal],
+            objetivos[canal],
             histogramas_origen[canal],
-            objetivos[canal]
-        )
-        salida[:, :, canal] = _aplicar_movimientos(
-            rgb[:, :, canal], movimientos
+            contrastes[canal]
         )
 
     return Image.fromarray(salida)
