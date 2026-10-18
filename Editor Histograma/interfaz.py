@@ -201,13 +201,11 @@ class Aplicacion:
             )
 
     def actualizar_previsualizacion(self, objetivos):
-        self.hist_objetivo = objetivos.copy()
-
         if self.original is None:
-            return
+            return False
 
-        # Para imágenes grandes, la transformación completa puede tardar.
         try:
+            self.hist_objetivo = objetivos.copy()
             self.resultado = transformar_rgb(
                 self.original,
                 self.hist_objetivo,
@@ -222,9 +220,12 @@ class Aplicacion:
             self.mostrar_imagen(self.resultado)
 
             self.estado.config(text="Previsualización actualizada.")
+            self.actualizar_texto_muestras()
+            return True
 
         except Exception as error:
             self.estado.config(text=f"Error: {error}")
+            return False
 
     def _coordenadas_imagen(self, x, y):
         px = x - self.offset_x

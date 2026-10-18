@@ -65,8 +65,151 @@ def construir_transformacion(histograma_origen, histograma_objetivo):
     return mapa.astype(np.uint8)
 
 
+def _repartir_en_menos_poblados(cuentas, candidatos, cantidad, limite):
+    reparticion = np.zeros(256, dtype=np.int64)
+    restante = int(cantidad)
+
+    while restante > 0:
+        disponibles = candidatos[cuentas[candidatos] < limite]
+        if len(disponibles) == 0:
+            raise ValueError(
+                "No hay intensidades disponibles para recibir esos píxeles."
+            )
+
+        minimo = int(cuentas[disponibles].min())
+        grupo = disponibles[cuentas[disponibles] == minimo]
+        superiores = cuentas[disponibles][cuentas[disponibles] > minimo]
+        siguiente = min(int(superiores.min()), limite) if len(superiores) else limite
+        capacidad = (siguiente - minimo) * len(grupo)
+
+        if restante >= capacidad:
+            cuentas[grupo] += siguiente - minimo
+            reparticion[grupo] += siguiente - minimo
+            restante -= capacidad
+        else:
+            incremento, sobrante = divmod(restante, len(grupo))
+            cuentas[grupo] += incremento
+            reparticion[grupo] += incremento
+            if sobrante:
+                cuentas[grupo[:sobrante]] += 1
+                reparticion[grupo[:sobrante]] += 1
+            restante = 0
+
+    return reparticion
+
+
+def _construir_redistribucion(histograma_origen, histograma_objetivo):
+    origen = np.maximum(
+        np.asarray(histograma_origen, dtype=np.int64), 0
+    )
+    objetivo = np.asarray(histograma_objetivo, dtype=float)
+
+    if origen.shape != (256,) or objetivo.shape != (256,):
+        raise ValueError("Se esperaba un histograma de 256 intensidades.")
+
+    total = int(origen.sum())
+    if total == 0:
+        return origen.copy(), []
+
+    objetivo = np.nan_to_num(
+        objetivo, nan=0.0, posinf=float(total), neginf=0.0
+    )
+    objetivo = np.clip(objetivo, 0, total)
+    solicitado = np.rint(objetivo).astype(np.int64)
+    modificadas = solicitado != origen
+    libres = np.flatnonzero(~modificadas)
+    subidas = np.flatnonzero(solicitado > origen)
+    bajadas = np.flatnonzero(solicitado < origen)
+
+    if not len(subidas) and not len(bajadas):
+        return origen.copy(), []
+
+    finales = origen.copy()
+    finales[modificadas] = solicitado[modificadas]
+    movimientos = []
+    donantes = libres[np.argsort(-origen[libres], kind="stable")]
+    demanda_subidas = {
+        int(destino): int(solicitado[destino] - origen[destino])
+        for destino in subidas
+    }
+
+    for destino in subidas:
+        restante = demanda_subidas[int(destino)]
+        for fuente in donantes:
+            cantidad = min(restante, int(finales[fuente]))
+            if cantidad:
+                finales[fuente] -= cantidad
+                movimientos.append((int(fuente), int(destino), cantidad))
+                restante -= cantidad
+            if restante == 0:
+                break
+        demanda_subidas[int(destino)] = restante
+
+    for fuente in bajadas:
+        cantidad = int(origen[fuente] - solicitado[fuente])
+        restante = cantidad
+
+        for destino in subidas:
+            demanda = demanda_subidas[int(destino)]
+            trasladar = min(restante, demanda)
+            if trasladar:
+                movimientos.append((int(fuente), int(destino), trasladar))
+                demanda_subidas[int(destino)] -= trasladar
+                restante -= trasladar
+            if restante == 0:
+                break
+
+        if restante:
+            reparticion = _repartir_en_menos_poblados(
+                finales, libres, restante, total
+            )
+            for destino in np.flatnonzero(reparticion):
+                movimientos.append((int(fuente), int(destino), int(reparticion[destino])))
+
+    if any(demanda_subidas.values()):
+        raise ValueError(
+            "No hay suficientes píxeles para aumentar las barras seleccionadas."
+        )
+
+    return finales, movimientos
+
+
+def _aplicar_movimientos(canal, movimientos):
+    plano = np.asarray(canal, dtype=np.uint8).ravel()
+    salida = plano.copy()
+
+    if not movimientos:
+        return salida.reshape(canal.shape)
+
+    por_fuente = {}
+    for fuente, destino, cantidad in movimientos:
+        por_fuente.setdefault(fuente, []).append((destino, cantidad))
+
+    if len(por_fuente) <= 8:
+        for fuente, destinos in por_fuente.items():
+            posiciones = np.flatnonzero(plano == fuente)
+            inicio = 0
+            for destino, cantidad in destinos:
+                fin = inicio + cantidad
+                salida[posiciones[inicio:fin]] = destino
+                inicio = fin
+    else:
+        cuentas = np.bincount(plano, minlength=256)
+        orden = np.argsort(plano, kind="stable")
+        inicios = np.concatenate(([0], np.cumsum(cuentas[:-1])))
+        usados = np.zeros(256, dtype=np.int64)
+
+        for fuente, destino, cantidad in movimientos:
+            inicio = int(inicios[fuente] + usados[fuente])
+            fin = inicio + cantidad
+            salida[orden[inicio:fin]] = destino
+            usados[fuente] += cantidad
+
+    return salida.reshape(canal.shape)
+
+
 def calcular_histogramas_transformados(histogramas_origen, histogramas_objetivo):
-    """Calcula los histogramas de salida directamente desde los mapas."""
+    """Calcula los conteos resultantes respetando las barras editadas."""
     origen = np.asarray(histogramas_origen)
     objetivos = np.asarray(histogramas_objetivo, dtype=float)
 
@@ -76,12 +219,9 @@ def calcular_histogramas_transformados(histogramas_origen, histogramas_objetivo)
     salida = np.zeros((3, 256), dtype=np.int64)
 
     for canal in range(3):
-        mapa = construir_transformacion(origen[canal], objetivos[canal])
-        salida[canal] = np.bincount(
-            mapa,
-            weights=origen[canal],
-            minlength=256
-        ).astype(np.int64)
+        salida[canal], _ = _construir_redistribucion(
+            origen[canal], objetivos[canal]
+        )
 
     return salida
 
@@ -109,12 +249,13 @@ def transformar_rgb(
     salida = np.empty_like(rgb)
 
     for canal in range(3):
-        mapa = construir_transformacion(
+        _, movimientos = _construir_redistribucion(
             histogramas_origen[canal],
             objetivos[canal]
         )
-
-        salida[:, :, canal] = mapa[rgb[:, :, canal]]
+        salida[:, :, canal] = _aplicar_movimientos(
+            rgb[:, :, canal], movimientos
+        )
 
     return Image.fromarray(salida)
 

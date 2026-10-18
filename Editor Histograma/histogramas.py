@@ -2,6 +2,7 @@
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
 
 
 class EditorHistogramasRGB:
@@ -16,7 +17,10 @@ class EditorHistogramasRGB:
 
         self.canal_activo = None
         self.intensidad_activa = None
+        self.altura_previa = None
         self.max_pixeles = 1
+        self.barras_objetivo = []
+        self.fondos = {}
 
         self.figura = Figure(figsize=(11, 7), dpi=85)
         self.ejes = [
@@ -29,6 +33,28 @@ class EditorHistogramasRGB:
             left=0.09, right=0.98,
             top=0.96, bottom=0.07, hspace=0.55
         )
+
+        barra_controles = tk.Frame(contenedor)
+        barra_controles.pack(fill="x", pady=(0, 4))
+
+        self.botones_restablecer = []
+        for canal, nombre in enumerate(("rojo", "verde", "azul")):
+            boton = tk.Button(
+                barra_controles,
+                text=f"Restablecer {nombre}",
+                command=lambda canal=canal: self.restablecer_canal(canal),
+                state=tk.DISABLED
+            )
+            boton.pack(side="left", padx=(0, 4))
+            self.botones_restablecer.append(boton)
+
+        self.boton_aplicar = tk.Button(
+            barra_controles,
+            text="Aplicar cambios",
+            command=self.aplicar,
+            state=tk.DISABLED
+        )
+        self.boton_aplicar.pack(side="right")
 
         self.canvas = FigureCanvasTkAgg(
             self.figura, master=contenedor
@@ -46,6 +72,7 @@ class EditorHistogramasRGB:
         self.canvas.mpl_connect(
             "button_release_event", self.al_soltar
         )
+        self.canvas.mpl_connect("draw_event", self._guardar_fondos)
 
     def establecer_histogramas(self, histogramas):
         h = np.asarray(histogramas, dtype=float)
@@ -54,6 +81,9 @@ class EditorHistogramasRGB:
         self.actuales = h.copy()
         self.objetivos = h.copy()
         self.max_pixeles = max(float(h.max()), 1)
+        self.boton_aplicar.config(state=tk.DISABLED)
+        for boton in self.botones_restablecer:
+            boton.config(state=tk.NORMAL)
 
         self.dibujar()
 
@@ -61,37 +91,39 @@ class EditorHistogramasRGB:
         self.actuales = np.asarray(
             histogramas, dtype=float
         ).copy()
+        self.max_pixeles = max(
+            self.max_pixeles,
+            float(self.actuales.max()),
+            float(self.objetivos.max())
+        )
         self.dibujar()
 
     def dibujar(self):
         x = np.arange(256)
+        self.barras_objetivo = []
+        self.fondos.clear()
 
         for c, eje in enumerate(self.ejes):
             eje.clear()
 
-            eje.bar(
+            barras = eje.bar(
                 x, self.objetivos[c],
                 width=0.9,
                 color=self.COLORES[c],
-                alpha=0.35,
-                label="Objetivo"
+                alpha=0.55,
+                label="Histograma"
             )
-
-            eje.step(
-                x, self.actuales[c],
-                where="mid",
-                color="black",
-                linewidth=1.0,
-                label="Previsualización"
-            )
+            self.barras_objetivo.append(barras.patches)
+            for barra in barras.patches:
+                barra.set_animated(True)
 
             eje.step(
                 x, self.originales[c],
                 where="mid",
                 color="#888888",
-                linewidth=0.8,
+                linewidth=1.0,
                 linestyle="--",
-                label="Original"
+                label="Perfil original"
             )
 
             eje.set_xlim(0, 255)
@@ -126,6 +158,17 @@ class EditorHistogramasRGB:
 
         self.canvas.draw_idle()
 
+    def _guardar_fondos(self, evento):
+        self.fondos = {
+            c: self.canvas.copy_from_bbox(eje.bbox)
+            for c, eje in enumerate(self.ejes)
+        }
+
+        for eje, barras in zip(self.ejes, self.barras_objetivo):
+            for barra in barras:
+                eje.draw_artist(barra)
+            self.canvas.blit(eje.bbox)
+
     def al_presionar(self, evento):
         if (
             evento.button != 1
@@ -136,11 +179,9 @@ class EditorHistogramasRGB:
             return
 
         self.canal_activo = self.ejes.index(evento.inaxes)
-        self.intensidad_activa = int(
-            np.clip(round(evento.xdata), 0, 255)
-        )
-
-        self._editar(evento.ydata)
+        self.intensidad_activa = None
+        self.altura_previa = None
+        self._editar(evento.xdata, evento.ydata)
 
     def al_mover(self, evento):
         if (
@@ -150,30 +191,76 @@ class EditorHistogramasRGB:
         ):
             return
 
-        self._editar(evento.ydata)
+        self._editar(evento.xdata, evento.ydata)
 
-    def _editar(self, altura):
+    def _editar(self, intensidad, altura):
         c = self.canal_activo
-        i = self.intensidad_activa
-
-        if c is None or i is None:
+        if c is None:
             return
 
-        self.objetivos[c, i] = np.clip(
-            altura, 0, self.max_pixeles
+        intensidad = int(np.clip(round(intensidad), 0, 255))
+        altura = float(np.clip(altura, 0, self.max_pixeles))
+
+        if self.intensidad_activa is None:
+            intensidades = np.array([intensidad])
+            alturas = np.array([altura])
+        else:
+            paso = 1 if intensidad >= self.intensidad_activa else -1
+            intensidades = np.arange(
+                self.intensidad_activa, intensidad + paso, paso
+            )
+            alturas = np.linspace(
+                self.altura_previa, altura, len(intensidades)
+            )
+
+        barras = []
+        for indice, nueva_altura in zip(intensidades, alturas):
+            self.objetivos[c, indice] = nueva_altura
+            barra = self.barras_objetivo[c][indice]
+            barra.set_height(nueva_altura)
+            barras.append(barra)
+
+        self.intensidad_activa = intensidad
+        self.altura_previa = altura
+
+        self._actualizar_estado_aplicar()
+
+        fondo = self.fondos.get(c)
+        if fondo is None:
+            self.canvas.draw_idle()
+            return
+
+        self.canvas.restore_region(fondo)
+        for barra in barras:
+            self.ejes[c].draw_artist(barra)
+        self.canvas.blit(self.ejes[c].bbox)
+
+    def aplicar(self):
+        aplicado = self.al_modificar(self.objetivos.copy())
+        if aplicado is not False:
+            self.objetivos = self.actuales.copy()
+            self._actualizar_estado_aplicar()
+            self.dibujar()
+
+    def _actualizar_estado_aplicar(self):
+        pendientes = not np.allclose(self.objetivos, self.actuales)
+        self.boton_aplicar.config(
+            state=tk.NORMAL if pendientes else tk.DISABLED
         )
 
+    def restablecer_canal(self, canal):
+        self.objetivos[canal] = self.originales[canal]
         self.dibujar()
-
-        # Solicita una nueva previsualización.
-        self.al_modificar(self.objetivos.copy())
+        self._actualizar_estado_aplicar()
 
     def al_soltar(self, evento):
         self.canal_activo = None
         self.intensidad_activa = None
+        self.altura_previa = None
 
     def restablecer(self):
         self.actuales = self.originales.copy()
         self.objetivos = self.originales.copy()
         self.dibujar()
         self.al_modificar(self.objetivos.copy())
+        self.boton_aplicar.config(state=tk.DISABLED)
