@@ -21,21 +21,7 @@ def seleccionar_padre(
 def seleccionar_padres(
     poblacion
 ):
-    """
-    Selecciona toda la población de padres proporcionalmente a su aptitud (Fitness).
-    
-    Fundamentación Teórica (John Holland, 1975):
-    La probabilidad de selección de cada individuo 'i' es proporcional a su fitness relativo:
-    
-        P(i) = f_i / sum(f_j)
-        
-    El valor esperado de copias de un individuo en el mating pool es:
-    
-        E[n_i] = N * (f_i / f_promedio)
-        
-    Esto garantiza el cumplimiento del Teorema de los Esquemas (Schema Theorem),
-    otorgando una tasa exponencial de incremento a los hiperplanos de alta calidad.
-    """
+ 
     # --------------------------------------------------------
     # 1. Extraer fitness no negativo de cada individuo
     # --------------------------------------------------------
@@ -67,4 +53,4 @@ def seleccionar_padres(
         k=len(poblacion)
     )
 
-    return padres
+    return padres

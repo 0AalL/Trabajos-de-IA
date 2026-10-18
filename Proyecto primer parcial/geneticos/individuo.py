@@ -55,22 +55,7 @@ def crear_individuo(
         # ANTECEDENTES
         #
         # Se crea un gen por cada variable de entrada.
-        #
-        # Actualmente:
-        #
-        # 1. T_mean
-        # 2. RH_mean
-        # 3. Wind_mean
-        # 4. PPT_tot
-        # 5. FFMC
-        # 6. DMC
-        # 7. DC
-        # 8. KBDI
-        #
-        # Cada gen puede tomar uno de los conjuntos fuzzy
-        # de su variable o NO_USAR.
         # ====================================================
-
         for variable in VARIABLES_ENTRADA:
 
             opciones = (
@@ -103,8 +88,6 @@ def crear_individuo(
                     CONJUNTOS[VARIABLE_SALIDA]
                 )
             )
-
-
         # ====================================================
         # NO PERMITIR REGLA TRIVIAL O VACÍA
         #
