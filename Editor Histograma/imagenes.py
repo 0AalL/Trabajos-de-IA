@@ -108,6 +108,7 @@ def _construir_redistribucion(histograma_origen, histograma_objetivo):
         raise ValueError("Se esperaba un histograma de 256 intensidades.")
 
     total = int(origen.sum())
+
     if total == 0:
         return origen.copy(), []
 
@@ -116,6 +117,7 @@ def _construir_redistribucion(histograma_origen, histograma_objetivo):
     )
     objetivo = np.clip(objetivo, 0, total)
     solicitado = np.rint(objetivo).astype(np.int64)
+
     modificadas = solicitado != origen
     libres = np.flatnonzero(~modificadas)
     subidas = np.flatnonzero(solicitado > origen)
@@ -127,24 +129,42 @@ def _construir_redistribucion(histograma_origen, histograma_objetivo):
     finales = origen.copy()
     finales[modificadas] = solicitado[modificadas]
     movimientos = []
-    donantes = libres[np.argsort(-origen[libres], kind="stable")]
+
+    # Procesar primero las intensidades que más necesitan aumentar.
+    subidas = subidas[
+        np.argsort(-(solicitado[subidas] - origen[subidas]), kind="stable")
+    ]
+
+    donantes = libres[
+        np.argsort(-origen[libres], kind="stable")
+    ]
+
     demanda_subidas = {
         int(destino): int(solicitado[destino] - origen[destino])
         for destino in subidas
     }
 
+    # Financiar las subidas usando primero las intensidades libres.
     for destino in subidas:
         restante = demanda_subidas[int(destino)]
+
         for fuente in donantes:
             cantidad = min(restante, int(finales[fuente]))
+
             if cantidad:
                 finales[fuente] -= cantidad
-                movimientos.append((int(fuente), int(destino), cantidad))
+                movimientos.append(
+                    (int(fuente), int(destino), cantidad)
+                )
                 restante -= cantidad
+
             if restante == 0:
                 break
+
         demanda_subidas[int(destino)] = restante
 
+    # Usar los píxeles de las intensidades que deben disminuir
+    # para cubrir la demanda que todavía quede pendiente.
     for fuente in bajadas:
         cantidad = int(origen[fuente] - solicitado[fuente])
         restante = cantidad
@@ -152,27 +172,39 @@ def _construir_redistribucion(histograma_origen, histograma_objetivo):
         for destino in subidas:
             demanda = demanda_subidas[int(destino)]
             trasladar = min(restante, demanda)
+
             if trasladar:
-                movimientos.append((int(fuente), int(destino), trasladar))
+                movimientos.append(
+                    (int(fuente), int(destino), trasladar)
+                )
                 demanda_subidas[int(destino)] -= trasladar
                 restante -= trasladar
+
             if restante == 0:
                 break
 
+        # Si aún quedan píxeles por redistribuir, repartirlos
+        # entre las intensidades libres menos pobladas.
         if restante:
             reparticion = _repartir_en_menos_poblados(
                 finales, libres, restante, total
             )
-            for destino in np.flatnonzero(reparticion):
-                movimientos.append((int(fuente), int(destino), int(reparticion[destino])))
 
+            for destino in np.flatnonzero(reparticion):
+                movimientos.append(
+                    (
+                        int(fuente),
+                        int(destino),
+                        int(reparticion[destino])
+                    )
+                )
+
+    # Si quedó demanda sin satisfacer, devolver el estado actual
+    # sin lanzar una excepción.
     if any(demanda_subidas.values()):
-        raise ValueError(
-            "No hay suficientes píxeles para aumentar las barras seleccionadas."
-        )
+        return finales, movimientos
 
     return finales, movimientos
-
 
 def _aplicar_movimientos(canal, movimientos):
     plano = np.asarray(canal, dtype=np.uint8).ravel()

@@ -142,6 +142,17 @@ class Aplicacion:
         self.canvas_imagen.bind(
             "<Button-1>", self.agregar_muestra
         )
+        self.placeholder_imagen = self.canvas_imagen.create_text(
+            0, 0,
+            text="Carga una imagen para comenzar",
+            fill="#d0d0d0",
+            font=("TkDefaultFont", 16),
+            anchor="center",
+            tags="placeholder"
+        )
+        self.canvas_imagen.bind(
+            "<Configure>", self.centrar_placeholder
+        )
 
         self.info_color = tk.Label(
             marco,
@@ -277,6 +288,17 @@ class Aplicacion:
         self.canvas_imagen.configure(
             scrollregion=self.canvas_imagen.bbox("all")
         )
+
+    def centrar_placeholder(self, evento):
+        if self.original is None:
+            self.canvas_imagen.coords(
+                self.placeholder_imagen,
+                self.canvas_imagen.canvasx(evento.width / 2),
+                self.canvas_imagen.canvasy(evento.height / 2)
+            )
+            self.canvas_imagen.configure(
+                scrollregion=(0, 0, evento.width, evento.height)
+            )
 
     def cambiar_zoom(self, factor):
         if self.resultado is None:

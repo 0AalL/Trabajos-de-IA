@@ -28,7 +28,7 @@ class EditorHistogramasRGB:
         self.canal_activo = None
         self.intensidad_activa = None
         self.altura_previa = None
-        self.max_pixeles = 1
+        self.maximos_canales = np.ones(3, dtype=float)
         self.barras_objetivo = []
         self.barras_modificadas = [set(), set(), set()]
         self.perfiles_originales = []
@@ -49,6 +49,12 @@ class EditorHistogramasRGB:
             left=0.09, right=0.98,
             top=0.96, bottom=0.07, hspace=0.55
         )
+
+        tk.Label(
+            contenedor,
+            text="Arrastra las barras con el ratón para editar el histograma.",
+            anchor="w"
+        ).pack(fill="x", pady=(0, 4))
 
         barra_controles = tk.Frame(contenedor)
         barra_controles.pack(fill="x", pady=(0, 4))
@@ -125,7 +131,7 @@ class EditorHistogramasRGB:
         self.originales = h.copy()
         self.actuales = h.copy()
         self.objetivos = h.copy()
-        self.max_pixeles = max(float(h.max()), 1)
+        self.maximos_canales = np.maximum(h.max(axis=1), 1)
         self.contrastes[:] = 1.0
         self.contrastes_aplicados[:] = 1.0
         self.canales_histograma_pendientes.clear()
@@ -143,12 +149,9 @@ class EditorHistogramasRGB:
         for canal in canales:
             self.actuales[canal] = histogramas[canal]
             self.objetivos[canal] = self.actuales[canal]
-
-        self.max_pixeles = max(
-            self.max_pixeles,
-            float(self.actuales.max()),
-            float(self.objetivos.max())
-        )
+            self.maximos_canales[canal] = max(
+                float(self.actuales[canal].max()), 1
+            )
         self._actualizar_barras(canales)
 
     def dibujar(self):
@@ -184,7 +187,7 @@ class EditorHistogramasRGB:
             self.perfiles_originales.append(perfil)
 
             eje.set_xlim(0, 255)
-            eje.set_ylim(0, self.max_pixeles * 1.05)
+            eje.set_ylim(0, self.maximos_canales[c] * 1.05)
             eje.set_ylabel("Píxeles")
             eje.set_xlabel("Intensidad (0–255)")
             eje.set_title(self.NOMBRES[c])
@@ -236,7 +239,7 @@ class EditorHistogramasRGB:
             for intensidad, barra in enumerate(barras):
                 barra.set_height(self.objetivos[canal, intensidad])
 
-            eje.set_ylim(0, self.max_pixeles * 1.05)
+            eje.set_ylim(0, self.maximos_canales[canal] * 1.05)
             fondo = self.fondos.get(canal)
             if fondo is None:
                 self.canvas.draw_idle()
@@ -252,8 +255,8 @@ class EditorHistogramasRGB:
         self.actuales[canal] = np.asarray(histograma, dtype=float)
         if canal not in self.canales_histograma_pendientes:
             self.objetivos[canal] = self.actuales[canal]
-            self.max_pixeles = max(
-                self.max_pixeles, float(self.actuales[canal].max())
+            self.maximos_canales[canal] = max(
+                float(self.actuales[canal].max()), 1
             )
             self._actualizar_barras([canal])
 
@@ -289,7 +292,7 @@ class EditorHistogramasRGB:
             return
 
         intensidad = int(np.clip(round(intensidad), 0, 255))
-        altura = float(np.clip(altura, 0, self.max_pixeles))
+        altura = float(np.clip(altura, 0, self.maximos_canales[c]))
 
         if self.intensidad_activa is None:
             intensidades = np.array([intensidad])
@@ -378,6 +381,13 @@ class EditorHistogramasRGB:
         )
         for boton in self.botones_contraste:
             boton.config(state=estado)
+        estado_restablecer = (
+            tk.NORMAL
+            if self.histogramas_establecidos and not self.arrastrando
+            else tk.DISABLED
+        )
+        for boton in self.botones_restablecer:
+            boton.config(state=estado_restablecer)
 
     def restablecer_canal(self, canal):
         aplicado = self.al_restablecer_canal(canal)
@@ -386,6 +396,9 @@ class EditorHistogramasRGB:
 
         self.actuales[canal] = self.originales[canal]
         self.objetivos[canal] = self.originales[canal]
+        self.maximos_canales[canal] = max(
+            float(self.originales[canal].max()), 1
+        )
         self.contrastes[canal] = 1.0
         self.contrastes_aplicados[canal] = 1.0
         self.canales_histograma_pendientes.discard(canal)
