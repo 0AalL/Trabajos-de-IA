@@ -53,10 +53,13 @@ class Aplicacion:
             ("Guardar resultado", self.guardar),
         ]
 
+        self.botones_generales = []
         for texto, accion in botones:
-            tk.Button(
+            boton = tk.Button(
                 barra, text=texto, command=accion
-            ).pack(side="left", padx=3)
+            )
+            boton.pack(side="left", padx=3)
+            self.botones_generales.append(boton)
 
         self.estado = tk.Label(
             barra, text="Abre una imagen.", anchor="w"
@@ -102,15 +105,22 @@ class Aplicacion:
 
         controles_imagen = tk.Frame(marco)
         controles_imagen.pack(fill="x", pady=(0, 4))
-        tk.Button(
+        self.botones_zoom = []
+        boton_zoom_menos = tk.Button(
             controles_imagen, text="-", command=lambda: self.cambiar_zoom(0.8)
-        ).pack(side="left", padx=2)
-        tk.Button(
+        )
+        boton_zoom_menos.pack(side="left", padx=2)
+        boton_zoom_mas = tk.Button(
             controles_imagen, text="+", command=lambda: self.cambiar_zoom(1.25)
-        ).pack(side="left", padx=2)
-        tk.Button(
+        )
+        boton_zoom_mas.pack(side="left", padx=2)
+        boton_zoom_ajustar = tk.Button(
             controles_imagen, text="Ajustar", command=self.ajustar_zoom
-        ).pack(side="left", padx=4)
+        )
+        boton_zoom_ajustar.pack(side="left", padx=4)
+        self.botones_zoom.extend(
+            (boton_zoom_menos, boton_zoom_mas, boton_zoom_ajustar)
+        )
         self.boton_bajar_intensidad = tk.Button(
             controles_imagen,
             text="- Intensidad",
@@ -125,10 +135,18 @@ class Aplicacion:
             state=tk.DISABLED
         )
         self.boton_subir_intensidad.pack(side="left", padx=2)
-        tk.Button(
+        self.boton_quitar_seleccion = tk.Button(
+            controles_imagen,
+            text="Quitar selección",
+            command=self.quitar_seleccion,
+            state=tk.DISABLED
+        )
+        self.boton_quitar_seleccion.pack(side="left", padx=(4, 2))
+        self.boton_borrar_muestras = tk.Button(
             controles_imagen, text="Borrar muestras",
             command=self.borrar_muestras
-        ).pack(side="right", padx=2)
+        )
+        self.boton_borrar_muestras.pack(side="right", padx=2)
 
         area_imagen = tk.Frame(marco)
         area_imagen.pack(fill="both", expand=True)
@@ -257,7 +275,7 @@ class Aplicacion:
             self.seleccion_roi = None
             self.rectangulo_seleccion = None
             self.ajustes_region = [[], [], []]
-            self._actualizar_botones_intensidad()
+            self._actualizar_estado_seleccion()
 
             self.muestras.clear()
             self.actualizar_texto_muestras()
@@ -403,14 +421,14 @@ class Aplicacion:
                 self.info_seleccion.config(
                     text=f"Zona seleccionada: {x1 - x0} × {y1 - y0} píxeles"
                 )
-                self._actualizar_botones_intensidad()
+                self._actualizar_estado_seleccion()
                 self.mostrar_imagen(self.resultado)
         else:
             self.seleccion_roi = None
             self.info_seleccion.config(
                 text="Arrastra sobre la imagen para seleccionar una zona."
             )
-            self._actualizar_botones_intensidad()
+            self._actualizar_estado_seleccion()
             self.agregar_muestra(evento)
 
         self.seleccion_inicio = None
@@ -423,6 +441,34 @@ class Aplicacion:
         )
         self.boton_bajar_intensidad.config(state=estado)
         self.boton_subir_intensidad.config(state=estado)
+
+    def _actualizar_estado_seleccion(self):
+        seleccion_activa = self.seleccion_roi is not None
+        estado = tk.DISABLED if seleccion_activa else tk.NORMAL
+
+        for boton in self.botones_generales:
+            boton.config(state=estado)
+        for boton in self.botones_zoom:
+            boton.config(state=estado)
+        self.boton_borrar_muestras.config(state=estado)
+        self.boton_quitar_seleccion.config(
+            state=tk.NORMAL if seleccion_activa else tk.DISABLED
+        )
+        self._actualizar_botones_intensidad()
+        self.editor.establecer_seleccion_imagen(seleccion_activa)
+
+    def quitar_seleccion(self):
+        self.seleccion_roi = None
+        self.seleccion_inicio = None
+        if self.rectangulo_seleccion is not None:
+            self.canvas_imagen.delete(self.rectangulo_seleccion)
+            self.rectangulo_seleccion = None
+        self.info_seleccion.config(
+            text="Arrastra sobre la imagen para seleccionar una zona."
+        )
+        self._actualizar_estado_seleccion()
+        if self.resultado is not None:
+            self.mostrar_imagen(self.resultado)
 
     def ajustar_intensidad_seleccionada(self, cantidad):
         if self.seleccion_roi is None or self.resultado is None:

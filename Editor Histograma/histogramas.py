@@ -36,6 +36,7 @@ class EditorHistogramasRGB:
         self.canales_histograma_pendientes = set()
         self.histogramas_establecidos = False
         self.arrastrando = False
+        self.seleccion_imagen_activa = False
         self.botones_contraste = []
 
         self.figura = Figure(figsize=(11, 7), dpi=85)
@@ -370,8 +371,16 @@ class EditorHistogramasRGB:
     def _actualizar_estado_aplicar(self):
         pendientes = bool(self.canales_histograma_pendientes)
         self.boton_aplicar.config(
-            state=tk.NORMAL if pendientes else tk.DISABLED
+            state=(
+                tk.NORMAL
+                if pendientes and not self.seleccion_imagen_activa
+                else tk.DISABLED
+            )
         )
+
+    def establecer_seleccion_imagen(self, activa):
+        self.seleccion_imagen_activa = bool(activa)
+        self._actualizar_estado_controles()
 
     def _actualizar_estado_controles(self):
         self._actualizar_estado_aplicar()
@@ -380,13 +389,16 @@ class EditorHistogramasRGB:
             if self.histogramas_establecidos
             and not self.arrastrando
             and not self.canales_histograma_pendientes
+            and not self.seleccion_imagen_activa
             else tk.DISABLED
         )
         for boton in self.botones_contraste:
             boton.config(state=estado)
         estado_restablecer = (
             tk.NORMAL
-            if self.histogramas_establecidos and not self.arrastrando
+            if self.histogramas_establecidos
+            and not self.arrastrando
+            and not self.seleccion_imagen_activa
             else tk.DISABLED
         )
         for boton in self.botones_restablecer:
