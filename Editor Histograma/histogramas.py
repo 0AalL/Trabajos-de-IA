@@ -22,8 +22,6 @@ class EditorHistogramasRGB:
         self.actuales = np.zeros((3, 256), dtype=float)
         self.originales = np.zeros((3, 256), dtype=float)
         self.objetivos = np.zeros((3, 256), dtype=float)
-        self.contrastes = np.ones(3, dtype=float)
-        self.contrastes_aplicados = np.ones(3, dtype=float)
 
         self.canal_activo = None
         self.intensidad_activa = None
@@ -133,8 +131,6 @@ class EditorHistogramasRGB:
         self.actuales = h.copy()
         self.objetivos = h.copy()
         self.maximos_canales = np.maximum(h.max(axis=1), 1)
-        self.contrastes[:] = 1.0
-        self.contrastes_aplicados[:] = 1.0
         self.canales_histograma_pendientes.clear()
         self.histogramas_establecidos = True
         self.arrastrando = False
@@ -339,7 +335,7 @@ class EditorHistogramasRGB:
             return
 
         aplicado = self.al_modificar(
-            self.objetivos.copy(), self.contrastes.copy(), canales_modificados
+            self.objetivos.copy(), np.ones(3, dtype=float), canales_modificados
         )
         if aplicado is not False:
             self.canales_histograma_pendientes.difference_update(
@@ -356,16 +352,8 @@ class EditorHistogramasRGB:
         ):
             return
 
-        nuevo_contraste = np.clip(
-            round(self.contrastes[canal] + incremento, 1), 1.0, 3.0
-        )
-        if np.isclose(nuevo_contraste, self.contrastes[canal]):
-            return
-
-        aplicado = self.al_cambiar_contraste(canal, nuevo_contraste)
+        aplicado = self.al_cambiar_contraste(canal, incremento)
         if aplicado is not False:
-            self.contrastes[canal] = nuevo_contraste
-            self.contrastes_aplicados[canal] = nuevo_contraste
             self._actualizar_estado_controles()
 
     def _actualizar_estado_aplicar(self):
@@ -414,8 +402,6 @@ class EditorHistogramasRGB:
         self.maximos_canales[canal] = max(
             float(self.originales[canal].max()), 1
         )
-        self.contrastes[canal] = 1.0
-        self.contrastes_aplicados[canal] = 1.0
         self.canales_histograma_pendientes.discard(canal)
         self._actualizar_barras([canal])
         self._actualizar_estado_controles()
@@ -430,12 +416,9 @@ class EditorHistogramasRGB:
     def restablecer(self):
         self.actuales = self.originales.copy()
         self.objetivos = self.originales.copy()
-        self.contrastes[:] = 1.0
-        self.contrastes_aplicados[:] = 1.0
         self.canales_histograma_pendientes.clear()
         self.arrastrando = False
         self.dibujar()
-        self.al_modificar(
-            self.objetivos.copy(), self.contrastes.copy(), [0, 1, 2]
-        )
+        for canal in range(3):
+            self.al_restablecer_canal(canal)
         self._actualizar_estado_controles()

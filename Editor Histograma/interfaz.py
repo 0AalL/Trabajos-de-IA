@@ -534,7 +534,7 @@ class Aplicacion:
         self.mostrar_imagen(self.resultado)
 
     def actualizar_previsualizacion(
-        self, objetivos, contrastes, canales_modificados
+        self, objetivos, _contrastes, canales_modificados
     ):
         if self.original is None:
             return False
@@ -543,23 +543,22 @@ class Aplicacion:
 
         try:
             histograma_nuevo = self.hist_objetivo.copy()
-            transformaciones = {}
-            for canal in canales_modificados:
-                histograma_nuevo[canal] = objetivos[canal]
-                valores = transformar_canal(
-                    np.asarray(self.original.getchannel(canal)),
-                    histograma_nuevo[canal],
-                    self.hist_original[canal],
-                    contrastes[canal]
-                )
-                valores = self._aplicar_ajustes_region(canal, valores)
-                transformaciones[canal] = Image.fromarray(valores)
-
             imagen_actual = (
                 self.resultado
                 if self.resultado is not None
                 else self.original
             )
+            histogramas_origen = self.editor.actuales.copy()
+            transformaciones = {}
+            for canal in canales_modificados:
+                histograma_nuevo[canal] = objetivos[canal]
+                valores = transformar_canal(
+                    np.asarray(imagen_actual.getchannel(canal)),
+                    histograma_nuevo[canal],
+                    histogramas_origen[canal]
+                )
+                transformaciones[canal] = Image.fromarray(valores)
+
             canales_resultado = list(imagen_actual.split())
             for canal, transformacion in transformaciones.items():
                 canales_resultado[canal] = transformacion
@@ -584,24 +583,25 @@ class Aplicacion:
             self.estado.config(text=f"Error: {error}")
             return False
 
-    def actualizar_contraste(self, canal, contraste):
-        if self.original is None:
+    def actualizar_contraste(self, canal, incremento):
+        if self.resultado is None:
             return False
 
         try:
-            valores = transformar_canal(
-                np.asarray(self.original.getchannel(canal)),
-                self.hist_objetivo[canal],
-                self.hist_original[canal],
-                contraste
-            )
-            valores = self._aplicar_ajustes_region(canal, valores)
+            valores_actuales = np.asarray(self.resultado.getchannel(canal))
+            factor = float(np.clip(1.0 + incremento, 0.1, 3.0))
+            valores = np.clip(
+                np.rint((valores_actuales.astype(float) - 127.5) * factor + 127.5),
+                0,
+                255
+            ).astype(np.uint8)
             canal_resultado = Image.fromarray(valores)
             canales_resultado = list(self.resultado.split())
             canales_resultado[canal] = canal_resultado
             self.resultado = Image.merge("RGB", tuple(canales_resultado))
 
             histograma = np.bincount(valores.ravel(), minlength=256)
+            self.hist_objetivo[canal] = histograma
             self.editor.actualizar_contraste_actual(canal, histograma)
             self.mostrar_imagen(self.resultado)
             self.actualizar_texto_muestras()
