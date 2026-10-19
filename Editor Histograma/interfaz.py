@@ -36,6 +36,10 @@ class Aplicacion:
         self.muestras = []
         self.zoom = 1.0
         self.escala_ajuste = None
+        self.seleccion_inicio = None
+        self.seleccion_roi = None
+        self.rectangulo_seleccion = None
+        self.ajustes_region = [[], [], []]
 
         self.crear_interfaz()
 
@@ -107,6 +111,20 @@ class Aplicacion:
         tk.Button(
             controles_imagen, text="Ajustar", command=self.ajustar_zoom
         ).pack(side="left", padx=4)
+        self.boton_bajar_intensidad = tk.Button(
+            controles_imagen,
+            text="- Intensidad",
+            command=lambda: self.ajustar_intensidad_seleccionada(-12),
+            state=tk.DISABLED
+        )
+        self.boton_bajar_intensidad.pack(side="left", padx=(8, 2))
+        self.boton_subir_intensidad = tk.Button(
+            controles_imagen,
+            text="+ Intensidad",
+            command=lambda: self.ajustar_intensidad_seleccionada(12),
+            state=tk.DISABLED
+        )
+        self.boton_subir_intensidad.pack(side="left", padx=2)
         tk.Button(
             controles_imagen, text="Borrar muestras",
             command=self.borrar_muestras
@@ -140,7 +158,13 @@ class Aplicacion:
             "<Motion>", self.mostrar_valores
         )
         self.canvas_imagen.bind(
-            "<Button-1>", self.agregar_muestra
+            "<ButtonPress-1>", self.iniciar_seleccion
+        )
+        self.canvas_imagen.bind(
+            "<B1-Motion>", self.actualizar_seleccion
+        )
+        self.canvas_imagen.bind(
+            "<ButtonRelease-1>", self.finalizar_seleccion
         )
         self.placeholder_imagen = self.canvas_imagen.create_text(
             0, 0,
@@ -167,6 +191,13 @@ class Aplicacion:
             anchor="w"
         )
         self.info_muestras.pack(fill="x")
+
+        self.info_seleccion = tk.Label(
+            marco,
+            text="Arrastra sobre la imagen para seleccionar una zona.",
+            anchor="w"
+        )
+        self.info_seleccion.pack(fill="x")
 
         marco_hist = tk.LabelFrame(
             contenido,
@@ -222,6 +253,11 @@ class Aplicacion:
             self.hist_objetivo = self.hist_original.astype(float)
             self.zoom = 1.0
             self.escala_ajuste = None
+            self.seleccion_inicio = None
+            self.seleccion_roi = None
+            self.rectangulo_seleccion = None
+            self.ajustes_region = [[], [], []]
+            self._actualizar_botones_intensidad()
 
             self.muestras.clear()
             self.actualizar_texto_muestras()
@@ -285,9 +321,147 @@ class Aplicacion:
                 text=str(numero), fill="white"
             )
 
+        if self.seleccion_roi is not None:
+            x0, y0, x1, y1 = self.seleccion_roi
+            self.rectangulo_seleccion = self.canvas_imagen.create_rectangle(
+                x0 / self.factor_x,
+                y0 / self.factor_y,
+                x1 / self.factor_x,
+                y1 / self.factor_y,
+                outline="#ffe066",
+                width=2,
+                dash=(5, 3),
+                tags="seleccion"
+            )
+
         self.canvas_imagen.configure(
             scrollregion=self.canvas_imagen.bbox("all")
         )
+
+    def iniciar_seleccion(self, evento):
+        if self.original is None:
+            return
+
+        punto = self._coordenadas_imagen(evento.x, evento.y)
+        if punto is None:
+            self.seleccion_inicio = None
+            return
+
+        self.seleccion_inicio = (
+            self.canvas_imagen.canvasx(evento.x),
+            self.canvas_imagen.canvasy(evento.y),
+            punto
+        )
+        if self.rectangulo_seleccion is not None:
+            self.canvas_imagen.delete(self.rectangulo_seleccion)
+            self.rectangulo_seleccion = None
+
+    def actualizar_seleccion(self, evento):
+        if self.seleccion_inicio is None:
+            return
+
+        x0, y0, _ = self.seleccion_inicio
+        x1 = self.canvas_imagen.canvasx(evento.x)
+        y1 = self.canvas_imagen.canvasy(evento.y)
+        if self.rectangulo_seleccion is None:
+            self.rectangulo_seleccion = self.canvas_imagen.create_rectangle(
+                x0, y0, x1, y1,
+                outline="#ffe066",
+                width=2,
+                dash=(5, 3),
+                tags="seleccion"
+            )
+        else:
+            self.canvas_imagen.coords(
+                self.rectangulo_seleccion, x0, y0, x1, y1
+            )
+
+    def finalizar_seleccion(self, evento):
+        if self.seleccion_inicio is None:
+            return
+
+        inicio_x, inicio_y, punto_inicio = self.seleccion_inicio
+        punto_fin = self._coordenadas_imagen(evento.x, evento.y)
+        fin_x = self.canvas_imagen.canvasx(evento.x)
+        fin_y = self.canvas_imagen.canvasy(evento.y)
+        es_rectangulo = (
+            punto_fin is not None
+            and (abs(fin_x - inicio_x) >= 5 or abs(fin_y - inicio_y) >= 5)
+        )
+
+        if self.rectangulo_seleccion is not None:
+            self.canvas_imagen.delete(self.rectangulo_seleccion)
+            self.rectangulo_seleccion = None
+
+        if es_rectangulo:
+            x0 = min(punto_inicio[0], punto_fin[0])
+            y0 = min(punto_inicio[1], punto_fin[1])
+            x1 = min(max(punto_inicio[0], punto_fin[0]) + 1, self.original.width)
+            y1 = min(max(punto_inicio[1], punto_fin[1]) + 1, self.original.height)
+            if x1 > x0 and y1 > y0:
+                self.seleccion_roi = (x0, y0, x1, y1)
+                self.info_seleccion.config(
+                    text=f"Zona seleccionada: {x1 - x0} × {y1 - y0} píxeles"
+                )
+                self._actualizar_botones_intensidad()
+                self.mostrar_imagen(self.resultado)
+        else:
+            self.seleccion_roi = None
+            self.info_seleccion.config(
+                text="Arrastra sobre la imagen para seleccionar una zona."
+            )
+            self._actualizar_botones_intensidad()
+            self.agregar_muestra(evento)
+
+        self.seleccion_inicio = None
+
+    def _actualizar_botones_intensidad(self):
+        estado = (
+            tk.NORMAL
+            if self.seleccion_roi is not None and self.resultado is not None
+            else tk.DISABLED
+        )
+        self.boton_bajar_intensidad.config(state=estado)
+        self.boton_subir_intensidad.config(state=estado)
+
+    def ajustar_intensidad_seleccionada(self, cantidad):
+        if self.seleccion_roi is None or self.resultado is None:
+            return
+        if self.editor.canales_histograma_pendientes:
+            self.estado.config(
+                text="Aplica primero los cambios del histograma."
+            )
+            return
+
+        x0, y0, x1, y1 = self.seleccion_roi
+        pixeles = np.asarray(self.resultado, dtype=np.int16).copy()
+        for canal in range(3):
+            pixeles[y0:y1, x0:x1, canal] = np.clip(
+                pixeles[y0:y1, x0:x1, canal] + cantidad, 0, 255
+            )
+            self.ajustes_region[canal].append(
+                (x0, y0, x1, y1, cantidad)
+            )
+
+        self.resultado = Image.fromarray(pixeles.astype(np.uint8))
+        histogramas = self.editor.actuales.copy()
+        for canal in range(3):
+            histogramas[canal] = np.bincount(
+                pixeles[:, :, canal].astype(np.uint8).ravel(),
+                minlength=256
+            )
+        self.editor.actualizar_actuales(histogramas, [0, 1, 2])
+        self.mostrar_imagen(self.resultado)
+        self.actualizar_texto_muestras()
+        self.estado.config(text="Intensidad de la zona actualizada.")
+
+    def _aplicar_ajustes_region(self, canal, valores):
+        salida = np.asarray(valores, dtype=np.int16).copy()
+        for x0, y0, x1, y1, cantidad in self.ajustes_region[canal]:
+            salida[y0:y1, x0:x1] = np.clip(
+                salida[y0:y1, x0:x1] + cantidad, 0, 255
+            )
+        return salida.astype(np.uint8)
 
     def centrar_placeholder(self, evento):
         if self.original is None:
@@ -326,14 +500,14 @@ class Aplicacion:
             transformaciones = {}
             for canal in canales_modificados:
                 histograma_nuevo[canal] = objetivos[canal]
-                transformaciones[canal] = Image.fromarray(
-                    transformar_canal(
-                        np.asarray(self.original.getchannel(canal)),
-                        histograma_nuevo[canal],
-                        self.hist_original[canal],
-                        contrastes[canal]
-                    )
+                valores = transformar_canal(
+                    np.asarray(self.original.getchannel(canal)),
+                    histograma_nuevo[canal],
+                    self.hist_original[canal],
+                    contrastes[canal]
                 )
+                valores = self._aplicar_ajustes_region(canal, valores)
+                transformaciones[canal] = Image.fromarray(valores)
 
             imagen_actual = (
                 self.resultado
@@ -375,6 +549,7 @@ class Aplicacion:
                 self.hist_original[canal],
                 contraste
             )
+            valores = self._aplicar_ajustes_region(canal, valores)
             canal_resultado = Image.fromarray(valores)
             canales_resultado = list(self.resultado.split())
             canales_resultado[canal] = canal_resultado
@@ -394,6 +569,7 @@ class Aplicacion:
         if self.original is None:
             return False
 
+        self.ajustes_region[canal].clear()
         canales = list(self.resultado.split())
         canales[canal] = self.original.getchannel(canal)
         self.resultado = Image.merge("RGB", tuple(canales))
@@ -493,6 +669,12 @@ class Aplicacion:
 
         self.resultado = self.original.copy()
         self.hist_objetivo = self.hist_original.astype(float)
+        self.ajustes_region = [[], [], []]
+        self.seleccion_roi = None
+        self.info_seleccion.config(
+            text="Arrastra sobre la imagen para seleccionar una zona."
+        )
+        self._actualizar_botones_intensidad()
         self.zoom = 1.0
         self.escala_ajuste = None
 

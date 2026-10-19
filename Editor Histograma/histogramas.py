@@ -175,15 +175,18 @@ class EditorHistogramasRGB:
             for barra in barras.patches:
                 barra.set_animated(True)
 
+            maximo_original = max(float(self.originales[c].max()), 1)
             perfil, = eje.step(
-                x, self.originales[c],
+                x, self.originales[c] / maximo_original,
                 where="mid",
                 color="#333333",
                 linewidth=1.4,
                 linestyle="--",
                 label="Perfil original",
-                zorder=5
+                zorder=5,
+                transform=eje.get_xaxis_transform()
             )
+            perfil.set_animated(True)
             self.perfiles_originales.append(perfil)
 
             eje.set_xlim(0, 255)
