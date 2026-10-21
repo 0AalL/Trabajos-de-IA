@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hospital GA + Fuzzy Dashboard</title>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial;
+            margin: 20px;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 8px 5px;
+            border: none;
+            border-radius: 6px;
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #357ABD;
+        }
+
+        input {
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #4a90e2;
+            color: white;
+        }
+
+        td,
+        th {
+            padding: 8px;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        #status {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Hospital GA + Sistema Difuso</h1>
+
+    <h3>Parámetros</h3>
+
+    <label>Pacientes:</label>
+    <input type="number" id="num_patients" value="100">
+
+    <label>Doctores:</label>
+    <input type="number" id="doctors" value="10">
+
+    <br><br>
+    <button onclick="runSim()">Iniciar</button>
+    <button onclick="toggleFuzzy()">Mostrar / Ocultar sistema difuso</button>
+
+    <div id="status"></div>
+
+    <div id="fuzzyContainer">
+
+        <h3>Funciones de pertenencia</h3>
+
+        <div class="grid">
+            <div id="hr_plot"></div>
+            <div id="rr_plot"></div>
+            <div id="spo2_plot"></div>
+            <div id="wait_plot"></div>
+            <div id="out_plot"></div>
+        </div>
+
+        <h3>Reglas del sistema difuso</h3>
+
+        <div class="box">
+            <table>
+                <tr>
+                    <th>Condición 1</th>
+                    <th>Condición 2</th>
+                    <th>Condición 3</th>
+                    <th>Salida</th>
+                </tr>
+
+                <!-- PRIORIDAD ALTA -->
+                <tr>
+                    <td>FC alta</td>
+                    <td>SpO2 baja</td>
+                    <td>-</td>
+                    <td>Nivel 3</td>
+                </tr>
+                <tr>
+                    <td>FR alta</td>
+                    <td>SpO2 baja</td>
+                    <td>-</td>
+                    <td>Nivel 3</td>
+                </tr>
+                <tr>
+                    <td>FC alta</td>
+                    <td>FR alta</td>
+                    <td>-</td>
+                    <td>Nivel 3</td>
+                </tr>
+                <tr>
+                    <td>Espera alta</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>Nivel 3</td>
+                </tr>
+
+                <!-- MEDIA -->
+                <tr>
+                    <td>FC media</td>
+                    <td>FR media</td>
+                    <td>SpO2 media</td>
+                    <td>Nivel 2</td>
+                </tr>
+                <tr>
+                    <td>FC media</td>
+                    <td>FR alta</td>
+                    <td>SpO2 media</td>
+                    <td>Nivel 2</td>
+                </tr>
+                <tr>
+                    <td>FC baja</td>
+                    <td>FR media</td>
+                    <td>SpO2 baja</td>
+                    <td>Nivel 2</td>
+                </tr>
+                <tr>
+                    <td>Espera media</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>Nivel 2</td>
+                </tr>
+
+                <!-- BAJA -->
+                <tr>
+                    <td>FC baja</td>
+                    <td>FR baja</td>
+                    <td>SpO2 alta</td>
+                    <td>Nivel 1</td>
+                </tr>
+                <tr>
+                    <td>FC baja</td>
+                    <td>SpO2 alta</td>
+                    <td>-</td>
+                    <td>Nivel 1</td>
+                </tr>
+                <tr>
+                    <td>FR baja</td>
+                    <td>SpO2 alta</td>
+                    <td>-</td>
+                    <td>Nivel 1</td>
+                </tr>
+
+            </table>
+        </div>
+
+    </div>
+
+    <h2>Individuo más apto</h2>
+    <div class="box">
+        <pre id="best_ind"></pre>
+    </div>
+
+    <h2>Evolución del algoritmo genético</h2>
+
+    <div class="grid">
+        <div id="c1"></div>
+        <div id="c2"></div>
+        <div id="c3"></div>
+    </div>
+
+    <h2>Distribución de esperas</h2>
+    <div id="wait_line"></div>
+
+    <script>
+
+        function toggleFuzzy() {
+            let div = document.getElementById("fuzzyContainer");
+            div.style.display = (div.style.display === "none") ? "block" : "none";
+        }
+
+        // -------------------
+        // FUNCIONES DE PERTENENCIA
+        // -------------------
+        function plotFuzzy() {
+
+            let x_hr = Array.from({ length: 241 }, (_, i) => i);
+
+            Plotly.newPlot("hr_plot", [
+                { x: x_hr, y: x_hr.map(v => Math.max(0, 1 - Math.abs(v - 40) / 40)), name: "Baja" },
+                { x: x_hr, y: x_hr.map(v => Math.max(0, 1 - Math.abs(v - 90) / 30)), name: "Media" },
+                { x: x_hr, y: x_hr.map(v => Math.max(0, (v - 110) / 130)), name: "Alta" }
+            ], { title: "Frecuencia cardíaca" });
+
+            let x_rr = Array.from({ length: 61 }, (_, i) => i);
+
+            Plotly.newPlot("rr_plot", [
+                { x: x_rr, y: x_rr.map(v => Math.max(0, 1 - Math.abs(v - 10) / 10)), name: "Baja" },
+                { x: x_rr, y: x_rr.map(v => Math.max(0, 1 - Math.abs(v - 20) / 8)), name: "Media" },
+                { x: x_rr, y: x_rr.map(v => Math.max(0, (v - 25) / 35)), name: "Alta" }
+            ], { title: "Frecuencia respiratoria" });
+
+            let x_spo2 = Array.from({ length: 51 }, (_, i) => i + 50);
+
+            Plotly.newPlot("spo2_plot", [
+                { x: x_spo2, y: x_spo2.map(v => Math.max(0, (92 - v) / 12)), name: "Baja" },
+                { x: x_spo2, y: x_spo2.map(v => Math.max(0, 1 - Math.abs(v - 94) / 2)), name: "Media" },
+                { x: x_spo2, y: x_spo2.map(v => Math.max(0, (v - 95) / 5)), name: "Alta" }
+            ], { title: "SpO2" });
+
+            let x_wait = Array.from({ length: 16 }, (_, i) => i);
+
+            Plotly.newPlot("wait_plot", [
+                { x: x_wait, y: x_wait.map(v => v <= 4 ? 1 : 0), name: "Bajo" },
+                { x: x_wait, y: x_wait.map(v => v > 3 && v <= 8 ? 1 : 0), name: "Medio" },
+                { x: x_wait, y: x_wait.map(v => v > 8 ? 1 : 0), name: "Alto" }
+            ], { title: "Tiempo de espera" });
+
+            let x_out = Array.from({ length: 11 }, (_, i) => i);
+
+            Plotly.newPlot("out_plot", [
+                { x: x_out, y: x_out.map(v => Math.max(0, Math.min((v - 0) / (2 - 0), (4 - v) / (4 - 2)))), name: "Nivel 1" },
+                { x: x_out, y: x_out.map(v => Math.max(0, Math.min((v - 3) / (5 - 3), (7 - v) / (7 - 5)))), name: "Nivel 2" },
+                { x: x_out, y: x_out.map(v => Math.max(0, Math.min((v - 6) / (8 - 6), (10 - v) / (10 - 8)))), name: "Nivel 3" }
+            ], { title: "Triaje" });
+        }
+
+        // -------------------
+        // SIMULACIÓN
+        // -------------------
+        function runSim() {
+
+            $("#status").text("Ejecutando...");
+
+            $.get("/run", {
+                num_patients: $("#num_patients").val(),
+                doctors: $("#doctors").val()
+            }, function () {
+                loadResults();
+            });
+        }
+
+        function loadResults() {
+
+            $.get("/results", function (d) {
+
+                $("#status").text("Listo");
+
+                Plotly.newPlot("c1", [{ y: d.history_fitness, type: "scatter" }],
+                    { title: "Fitness" });
+
+                Plotly.newPlot("c2", [{ y: d.history_promedios, type: "scatter" }],
+                    { title: "Tiempo promedio" });
+
+                Plotly.newPlot("c3", [{ y: d.history_ratio_graves, type: "scatter" }],
+                    { title: "Ratio críticos tardíos" });
+
+                Plotly.newPlot("wait_line", [{
+                    x: d.waits,
+                    type: "histogram"
+                }], { title: "Distribución de esperas" });
+
+                $("#best_ind").text(JSON.stringify(d.best_ind, null, 2));
+            });
+        }
+
+        plotFuzzy();
+
+    </script>
+
+</body>
+
+</html>
