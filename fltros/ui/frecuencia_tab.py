@@ -1,504 +1,338 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
+
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
+
 import utils
 
-# ==========================================
-# TAMAÑO
-# ==========================================
-IMG_W = 95
-IMG_H = 95
 
-img_rgb = None
-
-r = g = b = None
-r_f = g_f = b_f = None
-
-
-# ==========================================
-# FFT
-# ==========================================
-def fft2(img):
-
-    f = np.fft.fft2(img)
-
-    return np.fft.fftshift(f)
+PREVIEW_SIZE = (220, 220)
+SPECTRUM_PREVIEW_SIZE = (155, 155)
 
 
 def ifft2(fshift):
-
     f_ishift = np.fft.ifftshift(fshift)
-
-    img = np.fft.ifft2(f_ishift)
-
-    img = np.abs(img)
-
-    return np.uint8(np.clip(img, 0, 255))
+    return np.fft.ifft2(f_ishift).real
 
 
-def espectro_desde_fft(fshift):
+def mascara(shape, radio, tipo):
+    filas, columnas = shape
+    centro = (columnas // 2, filas // 2)
+    pasabajos = np.zeros((filas, columnas), np.uint8)
+    cv2.circle(pasabajos, centro, radio, 1, -1)
 
-    mag = 20 * np.log(np.abs(fshift) + 1)
+    if tipo == "pasabajos":
+        return pasabajos
+    if tipo == "pasaltos":
+        return 1 - pasabajos
 
-    mag = np.uint8(255 * mag / np.max(mag))
-
-    return mag
-
-
-def espectro(img):
-
-    fshift = fft2(img)
-
-    mag = espectro_desde_fft(fshift)
-
-    return mag, fshift
+    raise ValueError(f"Tipo de filtro no válido: {tipo}")
 
 
-def mascara(shape, radio):
-
-    rows, cols = shape
-
-    crow, ccol = rows // 2, cols // 2
-
-    mask = np.zeros((rows, cols), np.uint8)
-
-    cv2.circle(mask, (ccol, crow), radio, 1, -1)
-
-    return mask
-
-
-def filtrar(fshift, radio):
-
-    mask = mascara(fshift.shape, radio)
-
-    return fshift * mask
+def espectros_magnitud_canales(fourier_canales):
+    return [
+        cv2.normalize(
+            20 * np.log(np.abs(canal) + 1),
+            None,
+            0,
+            255,
+            cv2.NORM_MINMAX
+        ).astype(np.uint8)
+        for canal in fourier_canales
+    ]
 
 
-# ==========================================
-# MOSTRAR
-# ==========================================
-def mostrar_color(img, label, size=(IMG_W, IMG_H)):
-
-    img = cv2.resize(img, size)
-
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    img = Image.fromarray(img)
-
-    img = ImageTk.PhotoImage(img)
-
-    label.config(image=img)
-
-    label.image = img
+def transformar_canales_frecuencia(img):
+    return [
+        np.fft.fftshift(np.fft.fft2(canal))
+        for canal in cv2.split(img)
+    ]
 
 
-def mostrar_gris(img, label, size=(IMG_W, IMG_H)):
+def filtrar_rgb_frecuencia(img, radio, tipo):
+    fourier_entrada = transformar_canales_frecuencia(img)
+    mask = mascara(img.shape[:2], radio, tipo)
+    fourier_filtrada = [
+        canal * mask
+        for canal in fourier_entrada
+    ]
 
-    img = cv2.resize(img, size)
-
-    img = Image.fromarray(img)
-
-    img = ImageTk.PhotoImage(img)
-
-    label.config(image=img)
-
-    label.image = img
-
-
-# ==========================================
-# TAB
-# ==========================================
-def crear_tab_frecuencia(frame):
-
-    global img_rgb, r, g, b
-    global r_f, g_f, b_f
-
-    entry = {}
-
-    # ======================================
-    # RECONSTRUIR
-    # ======================================
-    def reconstruir():
-
-        if r_f is None or g_f is None or b_f is None:
-            return
-
-        img = cv2.merge([b_f, g_f, r_f])
-
-        mostrar_color(
-            img,
-            lbl_final,
-            size=(260, 260)
-        )
-
-    # ======================================
-    # APLICAR
-    # ======================================
-    def aplicar(canal):
-
-        global r_f, g_f, b_f
-
-        try:
-            radio = int(entry[canal].get())
-        except:
-            return
-
-        if canal == "r":
-
-            _, f = espectro(r)
-
-            f_filtrado = filtrar(f, radio)
-
-            r_f = ifft2(f_filtrado)
-
-            fft_filtrada = espectro_desde_fft(f_filtrado)
-
-            mostrar_gris(r_f, lbl_r_filtrada)
-
-            mostrar_gris(
-                fft_filtrada,
-                lbl_r_fft_filtrada
+    canales_resultado = []
+    for canal in fourier_filtrada:
+        respuesta = ifft2(canal)
+        if tipo == "pasaltos":
+            respuesta = cv2.normalize(
+                np.abs(respuesta),
+                None,
+                0,
+                255,
+                cv2.NORM_MINMAX
             )
-
-        elif canal == "g":
-
-            _, f = espectro(g)
-
-            f_filtrado = filtrar(f, radio)
-
-            g_f = ifft2(f_filtrado)
-
-            fft_filtrada = espectro_desde_fft(f_filtrado)
-
-            mostrar_gris(g_f, lbl_g_filtrada)
-
-            mostrar_gris(
-                fft_filtrada,
-                lbl_g_fft_filtrada
-            )
-
         else:
+            respuesta = np.clip(respuesta, 0, 255)
 
-            _, f = espectro(b)
+        canales_resultado.append(respuesta.astype(np.uint8))
 
-            f_filtrado = filtrar(f, radio)
+    resultado_rgb = cv2.merge(canales_resultado)
+    espectro_entrada = espectros_magnitud_canales(fourier_entrada)
+    espectro_filtrado = espectros_magnitud_canales(fourier_filtrada)
+    return resultado_rgb, espectro_entrada, espectro_filtrado
 
-            b_f = ifft2(f_filtrado)
 
-            fft_filtrada = espectro_desde_fft(f_filtrado)
+def mostrar_color_bgr(img, label):
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    imagen = Image.fromarray(img_rgb)
+    imagen.thumbnail(PREVIEW_SIZE)
+    imagen_tk = ImageTk.PhotoImage(imagen)
 
-            mostrar_gris(b_f, lbl_b_filtrada)
+    label.config(image=imagen_tk, text="")
+    label.image = imagen_tk
 
-            mostrar_gris(
-                fft_filtrada,
-                lbl_b_fft_filtrada
-            )
 
-        reconstruir()
+def mostrar_espectro(img, label):
+    imagen = Image.fromarray(img)
+    imagen.thumbnail(SPECTRUM_PREVIEW_SIZE)
+    imagen_tk = ImageTk.PhotoImage(imagen)
 
-    # ======================================
-    # MOSTRAR
-    # ======================================
-    def mostrar():
+    label.config(image=imagen_tk, text="")
+    label.image = imagen_tk
 
-        global r_f, g_f, b_f
 
-        mag_r, _ = espectro(r)
-        mag_g, _ = espectro(g)
-        mag_b, _ = espectro(b)
+def crear_tab_frecuencia(frame):
+    img_rgb = None
+    img_ruidosa = None
+    nivel_ruido = tk.IntVar(value=5)
+    radio = tk.StringVar(value="30")
 
-        # ORIGINALES
-        mostrar_gris(r, lbl_r)
-        mostrar_gris(g, lbl_g)
-        mostrar_gris(b, lbl_b)
+    def actualizar_ruido():
+        nonlocal img_ruidosa
 
-        # FFT
-        mostrar_gris(mag_r, lbl_r_fft)
-        mostrar_gris(mag_g, lbl_g_fft)
-        mostrar_gris(mag_b, lbl_b_fft)
-
-        # FILTRADAS
-        r_f = r.copy()
-        g_f = g.copy()
-        b_f = b.copy()
-
-        mostrar_gris(r_f, lbl_r_filtrada)
-        mostrar_gris(g_f, lbl_g_filtrada)
-        mostrar_gris(b_f, lbl_b_filtrada)
-
-        # FFT FILTRADAS
-        mostrar_gris(mag_r, lbl_r_fft_filtrada)
-        mostrar_gris(mag_g, lbl_g_fft_filtrada)
-        mostrar_gris(mag_b, lbl_b_fft_filtrada)
-
-        # ENTRIES
-        for c in ["r", "g", "b"]:
-
-            entry[c].delete(0, tk.END)
-
-            entry[c].insert(0, "0")
-
-        reconstruir()
-
-    # ======================================
-    # CARGAR
-    # ======================================
-    def cargar():
-
-        global img_rgb, r, g, b
-
-        path = filedialog.askopenfilename()
-
-        if not path:
+        if img_rgb is None:
             return
-
-        img_rgb = utils.cargar_imagen(
-            path,
-            gris=False
-        )
 
         img_ruidosa = utils.agregar_ruido_sal_pimienta(
             img_rgb,
-            prob=0.05
+            prob=nivel_ruido.get() / 100
+        )
+        mostrar_color_bgr(img_ruidosa, lbl_ruido)
+        espectros_entrada = espectros_magnitud_canales(
+            transformar_canales_frecuencia(img_ruidosa)
+        )
+        for canal, espectro in zip(("B", "G", "R"), espectros_entrada):
+            mostrar_espectro(espectro, lbl_espectro_entrada[canal])
+        for etiqueta in lbl_espectro_filtrado.values():
+            etiqueta.config(image="", text="Aplica un filtro")
+            etiqueta.image = None
+        lbl_resultado.config(image="", text="Aplica un filtro")
+        lbl_resultado.image = None
+
+    def cargar():
+        nonlocal img_rgb
+
+        ruta = filedialog.askopenfilename(
+            filetypes=[
+                ("Imágenes", "*.png *.jpg *.jpeg *.bmp")
+            ]
         )
 
-        r, g, b = utils.separar_canales(img_ruidosa)
+        if not ruta:
+            return
 
-        mostrar()
+        img_rgb = utils.cargar_imagen(ruta, gris=False)
+        mostrar_color_bgr(img_rgb, lbl_original)
+        actualizar_ruido()
 
-    # ======================================
-    # BOTON
-    # ======================================
-    tk.Button(
-        frame,
-        text="Cargar Imagen",
-        font=("Arial", 11, "bold"),
-        command=cargar
-    ).pack(pady=8)
+    def aplicar(tipo):
+        if img_ruidosa is None:
+            return
 
-    # ======================================
-    # CONTENEDOR GENERAL
-    # ======================================
-    contenedor_general = tk.Frame(frame)
+        try:
+            radio_filtro = int(radio.get())
+        except ValueError:
+            messagebox.showerror(
+                "Radio no válido",
+                "Ingresa un radio entero mayor o igual a 0."
+            )
+            return
 
-    contenedor_general.pack(
-        fill="both",
-        expand=True,
+        if radio_filtro < 0:
+            messagebox.showerror(
+                "Radio no válido",
+                "El radio debe ser mayor o igual a 0."
+            )
+            return
+
+        resultado_rgb, espectro_entrada, espectro_filtrado = (
+            filtrar_rgb_frecuencia(
+                img_ruidosa,
+                radio_filtro,
+                tipo
+            )
+        )
+        for canal, espectro in zip(("B", "G", "R"), espectro_entrada):
+            mostrar_espectro(espectro, lbl_espectro_entrada[canal])
+        for canal, espectro in zip(("B", "G", "R"), espectro_filtrado):
+            mostrar_espectro(espectro, lbl_espectro_filtrado[canal])
+        mostrar_color_bgr(resultado_rgb, lbl_resultado)
+
+    frame.rowconfigure(1, weight=1)
+    frame.columnconfigure(0, weight=1)
+
+    controles = tk.Frame(frame, bg="#f4f4f4")
+    controles.grid(
+        row=0,
+        column=0,
+        sticky="ew",
         padx=10,
         pady=10
     )
 
-    # ======================================
-    # IZQUIERDA -> CANALES
-    # ======================================
-    principal = tk.Frame(contenedor_general)
+    tk.Button(
+        controles,
+        text="📂 Cargar Imagen",
+        font=("Arial", 11, "bold"),
+        bg="#3498db",
+        fg="white",
+        command=cargar
+    ).pack(side="left")
 
-    principal.pack(
-        side="left",
-        fill="both",
-        expand=True
-    )
+    tk.Label(
+        controles,
+        text="Nivel de ruido:",
+        bg="#f4f4f4"
+    ).pack(side="left", padx=(15, 5))
 
-    # ======================================
-    # DERECHA -> IMAGEN FINAL
-    # ======================================
-    final_frame = tk.LabelFrame(
-        contenedor_general,
-        text="Imagen Reconstruida",
+    tk.Scale(
+        controles,
+        from_=0,
+        to=100,
+        resolution=1,
+        orient=tk.HORIZONTAL,
+        variable=nivel_ruido,
+        length=150,
+        showvalue=True,
+        bg="#f4f4f4"
+    ).pack(side="left")
+
+    tk.Label(
+        controles,
+        text="%",
+        bg="#f4f4f4"
+    ).pack(side="left", padx=(0, 8))
+
+    tk.Button(
+        controles,
+        text="Aplicar nivel",
+        command=actualizar_ruido
+    ).pack(side="left")
+
+    tk.Label(
+        controles,
+        text="Radio:",
+        bg="#f4f4f4"
+    ).pack(side="left", padx=(15, 5))
+
+    tk.Entry(
+        controles,
+        textvariable=radio,
+        width=6,
+        justify="center"
+    ).pack(side="left")
+
+    tk.Button(
+        controles,
+        text="Pasabajos",
+        command=lambda: aplicar("pasabajos")
+    ).pack(side="left", padx=(8, 2))
+
+    tk.Button(
+        controles,
+        text="Pasaltos",
+        command=lambda: aplicar("pasaltos")
+    ).pack(side="left", padx=2)
+
+    principal = tk.Frame(frame, bg="#f4f4f4")
+    principal.grid(
+        row=1,
+        column=0,
+        sticky="nsew",
         padx=10,
-        pady=10,
-        font=("Arial", 11, "bold")
+        pady=10
     )
 
-    final_frame.pack(
-        side="left",
-        padx=10,
-        anchor="n"
-    )
+    for columna in range(5):
+        principal.columnconfigure(columna, weight=1)
 
-    lbl_final = tk.Label(
-        final_frame,
-        bd=2,
-        relief="solid"
-    )
+    vistas = [
+        ("RGB Original", "color"),
+        ("RGB con Ruido", "color"),
+        ("Espectro de entrada", "espectro_entrada"),
+        ("Espectro filtrado", "espectro_filtrado"),
+        ("Resultado RGB", "color")
+    ]
+    etiquetas = []
+    lbl_espectro_entrada = {}
+    lbl_espectro_filtrado = {}
 
-    lbl_final.pack()
-
-    # ======================================
-    # PANEL CANAL
-    # ======================================
-    def crear_panel(parent, titulo, canal):
-
+    for columna, (titulo, tipo_vista) in enumerate(vistas):
         panel = tk.LabelFrame(
-            parent,
+            principal,
             text=titulo,
-            padx=5,
+            font=("Arial", 10, "bold"),
+            bg="#f4f4f4",
+            padx=4,
+            pady=4
+        )
+        panel.grid(
+            row=0,
+            column=columna,
+            padx=3,
             pady=5,
-            font=("Arial", 10, "bold")
+            sticky="n"
         )
 
-        panel.pack(
-            fill="x",
-            pady=5
-        )
+        if tipo_vista.startswith("espectro"):
+            etiquetas_canal = (
+                lbl_espectro_entrada
+                if tipo_vista == "espectro_entrada"
+                else lbl_espectro_filtrado
+            )
+            for canal in ("B", "G", "R"):
+                panel_canal = tk.LabelFrame(
+                    panel,
+                    text=f"Canal {canal}",
+                    bg="#f4f4f4",
+                    padx=2,
+                    pady=2
+                )
+                panel_canal.pack(pady=2)
+                etiqueta = tk.Label(
+                    panel_canal,
+                    bd=2,
+                    relief="solid",
+                    bg="white",
+                    text=(
+                        "Carga una imagen"
+                        if tipo_vista == "espectro_entrada"
+                        else "Aplica un filtro"
+                    ),
+                    compound=tk.CENTER
+                )
+                etiqueta.pack()
+                etiquetas_canal[canal] = etiqueta
+            continue
 
-        # ==================================
-        # CONTENEDOR HORIZONTAL
-        # ==================================
-        fila = tk.Frame(panel)
-
-        fila.pack()
-
-        # ==================================
-        # ORIGINAL
-        # ==================================
-        c1 = tk.Frame(fila)
-
-        c1.pack(side="left", padx=5)
-
-        tk.Label(
-            c1,
-            text="Original"
-        ).pack()
-
-        lbl_original = tk.Label(
-            c1,
+        etiqueta = tk.Label(
+            panel,
             bd=2,
-            relief="solid"
+            relief="solid",
+            bg="white",
+            text="Carga una imagen",
+            compound=tk.CENTER
         )
+        etiqueta.pack()
+        etiquetas.append(etiqueta)
 
-        lbl_original.pack()
-
-        # ==================================
-        # FFT
-        # ==================================
-        c2 = tk.Frame(fila)
-
-        c2.pack(side="left", padx=5)
-
-        tk.Label(
-            c2,
-            text="FFT"
-        ).pack()
-
-        lbl_fft = tk.Label(
-            c2,
-            bd=2,
-            relief="solid"
-        )
-
-        lbl_fft.pack()
-
-        # ==================================
-        # FILTRADA
-        # ==================================
-        c3 = tk.Frame(fila)
-
-        c3.pack(side="left", padx=5)
-
-        tk.Label(
-            c3,
-            text="Filtrada"
-        ).pack()
-
-        lbl_filtrada = tk.Label(
-            c3,
-            bd=2,
-            relief="solid"
-        )
-
-        lbl_filtrada.pack()
-
-        # ==================================
-        # FFT FILTRADA
-        # ==================================
-        c4 = tk.Frame(fila)
-
-        c4.pack(side="left", padx=5)
-
-        tk.Label(
-            c4,
-            text="FFT Filtrada"
-        ).pack()
-
-        lbl_fft_filtrada = tk.Label(
-            c4,
-            bd=2,
-            relief="solid"
-        )
-
-        lbl_fft_filtrada.pack()
-
-        # ==================================
-        # CONTROLES
-        # ==================================
-        control = tk.Frame(panel)
-
-        control.pack(pady=5)
-
-        tk.Label(
-            control,
-            text="Radio:"
-        ).pack(side="left")
-
-        entry[canal] = tk.Entry(
-            control,
-            width=5,
-            justify="center"
-        )
-
-        entry[canal].pack(
-            side="left",
-            padx=5
-        )
-
-        tk.Button(
-            control,
-            text="Aplicar",
-            command=lambda: aplicar(canal)
-        ).pack(side="left")
-
-        return (
-            lbl_original,
-            lbl_fft,
-            lbl_filtrada,
-            lbl_fft_filtrada
-        )
-
-    # ======================================
-    # CANALES
-    # ======================================
-    (
-        lbl_r,
-        lbl_r_fft,
-        lbl_r_filtrada,
-        lbl_r_fft_filtrada
-    ) = crear_panel(
-        principal,
-        "Canal R",
-        "r"
-    )
-
-    (
-        lbl_g,
-        lbl_g_fft,
-        lbl_g_filtrada,
-        lbl_g_fft_filtrada
-    ) = crear_panel(
-        principal,
-        "Canal G",
-        "g"
-    )
-
-    (
-        lbl_b,
-        lbl_b_fft,
-        lbl_b_filtrada,
-        lbl_b_fft_filtrada
-    ) = crear_panel(
-        principal,
-        "Canal B",
-        "b"
-    )
+    lbl_original, lbl_ruido, lbl_resultado = etiquetas

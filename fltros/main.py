@@ -6,7 +6,8 @@ from ui.frecuencia_tab import crear_tab_frecuencia
 
 root = tk.Tk()
 root.title("Procesamiento de Imágenes")
-root.geometry("1100x750")
+root.geometry("1400x900")
+root.state("zoomed")
 
 # Notebook (pestañas)
 notebook = ttk.Notebook(root)
